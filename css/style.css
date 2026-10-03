@@ -401,3 +401,96 @@ h1, h2, h3 {
     cursor: pointer;
 }
 .btn-danger:hover { background: #d9534f; color: white; }
+
+/* --- 新增：近期預約顯示區 --- */
+.profile-footer {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border-line);
+}
+
+.reservation-box {
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.active-res {
+    background-color: rgba(138, 122, 143, 0.08);
+    color: var(--lavender-hover);
+    border: 1px solid rgba(138, 122, 143, 0.2);
+    font-weight: bold;
+}
+
+.empty-res {
+    background-color: #f9f9f9;
+    color: var(--text-muted);
+    border: 1px dashed #ddd;
+}
+
+/* --- 新增：待取貨單管理介面 --- */
+.order-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 2rem 0;
+}
+
+.order-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.2rem 1rem;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.order-item:last-child {
+    border-bottom: none;
+}
+
+.order-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.order-item.completed .order-info {
+    color: var(--text-muted);
+    text-decoration: line-through;
+}
+
+/* 狀態標籤 */
+.badge {
+    font-size: 0.8rem;
+    padding: 0.3rem 0.6rem;
+    border-radius: 4px;
+    font-weight: bold;
+}
+
+.badge-pending {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.badge-completed {
+    background: #d4edda;
+    color: #155724;
+}
+
+.btn-small {
+    background: var(--lavender-primary);
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: all 0.3s;
+}
+
+.btn-small:hover {
+    background: var(--lavender-hover);
+    transform: translateY(-2px);
+}
