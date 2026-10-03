@@ -76,3 +76,123 @@ h1, h2, h3 {
     from { opacity: 0; transform: translateY(15px); }
     to { opacity: 1; transform: translateY(0); }
 }
+
+/* --- 分頁一：會員接待專屬樣式 --- */
+
+.section-title {
+    font-size: 2rem;
+    margin-bottom: 2rem;
+    border-bottom: 1px solid var(--border-line);
+    padding-bottom: 1rem;
+}
+
+.subsection-title {
+    font-size: 1.2rem;
+    margin-bottom: 1.5rem;
+    color: var(--lavender-primary);
+}
+
+/* 搜尋區塊 */
+.search-container {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 3rem;
+}
+
+.search-input {
+    flex: 1;
+    max-width: 400px;
+    background: transparent;
+    border: 1px solid var(--border-line);
+    border-radius: 4px;
+    padding: 0.8rem 1rem;
+    color: var(--text-light);
+    font-size: 1rem;
+    font-family: 'Noto Sans TC', sans-serif;
+    transition: border 0.3s ease;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: var(--lavender-primary);
+}
+
+.btn-primary {
+    background: var(--lavender-primary);
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 0.8rem 2rem;
+    font-size: 1rem;
+    cursor: pointer;
+    letter-spacing: 2px;
+    transition: background 0.3s ease;
+}
+
+.btn-primary:hover {
+    background: var(--lavender-hover);
+}
+
+/* 會員卡片展示區 */
+.tier-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+}
+
+.tier-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-line);
+    border-radius: 12px;
+    padding: 2rem;
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.tier-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+.tier-icon {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+}
+
+.tier-card h4 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.3rem;
+    letter-spacing: 1px;
+}
+
+.tier-subtitle {
+    color: #aaa;
+    font-size: 0.9rem;
+    margin-bottom: 1.5rem;
+}
+
+.tier-benefits {
+    list-style: none;
+    padding: 0;
+    text-align: left;
+    font-size: 0.95rem;
+    line-height: 1.8;
+}
+
+.tier-benefits li::before {
+    content: '✦ ';
+    color: var(--lavender-primary);
+}
+
+/* 搜尋結果動態框 */
+.member-result-box {
+    background: rgba(138, 122, 143, 0.1);
+    border: 1px solid var(--lavender-primary);
+    border-radius: 8px;
+    padding: 2rem;
+    margin-bottom: 3rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    animation: fadeIn 0.4s ease-out;
+}
