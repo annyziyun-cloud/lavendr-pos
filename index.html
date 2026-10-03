@@ -127,14 +127,30 @@
             <div id="bookingDashboard">
                 <h3 class="subsection-title">📅 預約排程管理 (矩陣式)</h3>
                 
-                <!-- 橫向日期選擇器 -->
-                <div class="date-selector" id="dateSelector">
-                    <!-- 由 JavaScript 動態生成日期按鈕 -->
+                <!-- 新增：自由選擇日期的日曆輸入框 -->
+                <div class="booking-controls" style="margin-bottom: 2rem;">
+                    <label for="bookingDate" style="font-weight: bold; margin-right: 10px; color: var(--text-dark);">選擇預約日期：</label>
+                    <input type="date" id="bookingDate" class="date-picker-input">
                 </div>
 
                 <!-- 每日時段列表 (一對一，每時段上限2人) -->
                 <div class="daily-schedule" id="dailySchedule">
                     <!-- 由 JavaScript 動態生成 6 個時段方塊 -->
+                </div>
+            </div>
+
+            <!-- 新增：專屬淺白色預約輸入彈窗 (預設隱藏) -->
+            <div id="bookingModal" class="custom-modal-overlay" style="display: none;">
+                <div class="custom-modal-box">
+                    <h3 style="margin-top: 0; color: var(--text-dark);">新增預約</h3>
+                    <p id="bookingModalText" style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 15px;">請輸入欲預約 【】 的顧客電話：</p>
+                    <input type="tel" id="bookingModalPhone" class="search-input" style="width: 100%; margin-bottom: 10px;" placeholder="例: 0900000000">
+                    <p style="font-size: 0.85rem; color: #888; margin: 0;">(如需攜伴製作兩瓶，請使用同行者的電話分開預約此時段)</p>
+                    
+                    <div class="form-actions" style="margin-top: 25px;">
+                        <button class="btn-text" onclick="closeBookingModal()">取消</button>
+                        <button class="btn-primary" onclick="confirmBooking()">確定預約</button>
+                    </div>
                 </div>
             </div>
 
