@@ -250,3 +250,154 @@ h1, h2, h3 {
 .tier-card.lavender-vip .tier-benefits li::before {
     color: var(--accent-gold);
 }
+
+/* --- 新增：次要按鈕樣式 --- */
+.btn-secondary {
+    background: transparent;
+    color: var(--lavender-primary);
+    border: 1px solid var(--lavender-primary);
+    border-radius: 6px;
+    padding: 0.8rem 1.5rem;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-secondary:hover {
+    background: rgba(138, 122, 143, 0.1);
+}
+
+.btn-text {
+    background: transparent;
+    color: var(--text-muted);
+    border: none;
+    font-size: 1rem;
+    cursor: pointer;
+    padding: 0.8rem 1.5rem;
+}
+
+.btn-text:hover { color: #333; }
+
+/* --- 新增：類似 Google Form 的表單樣式 --- */
+.form-card {
+    background: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+    overflow: hidden;
+    margin-bottom: 3rem;
+    border-top: 8px solid var(--lavender-primary); /* 表單頂部亮色飾條 */
+    animation: fadeIn 0.4s ease-out;
+    max-width: 700px;
+}
+
+.form-header {
+    padding: 2rem 3rem 1rem;
+    border-bottom: 1px solid var(--border-line);
+}
+
+.form-header h3 { margin: 0 0 0.5rem 0; font-size: 1.5rem; }
+.form-header p { margin: 0; color: var(--text-muted); }
+
+.form-body {
+    padding: 2rem 3rem;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+    color: #555;
+    font-weight: bold;
+}
+
+.form-group input, .form-group select {
+    padding: 0.8rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+    font-family: inherit;
+    transition: border 0.3s;
+}
+
+.form-group input:focus, .form-group select:focus {
+    outline: none;
+    border-color: var(--lavender-primary);
+}
+
+.form-group input[readonly] {
+    background: #f5f5f5;
+    color: #888;
+    cursor: not-allowed;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+/* --- 新增：長方形會員資料方塊樣式 --- */
+.profile-card {
+    background: #ffffff;
+    border: 1px solid var(--border-line);
+    border-radius: 12px;
+    padding: 2.5rem;
+    margin-bottom: 3rem;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.05);
+    display: flex;
+    flex-direction: column;
+    animation: fadeIn 0.4s ease-out;
+}
+
+.profile-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.profile-info {
+    display: flex;
+    gap: 3rem;
+}
+
+.info-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.info-label {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-bottom: 0.3rem;
+}
+
+.info-value {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: var(--text-dark);
+}
+
+.profile-actions {
+    display: flex;
+    gap: 1rem;
+}
+
+/* 特殊按鈕：刪除帳號 */
+.btn-danger {
+    background: transparent;
+    color: #d9534f;
+    border: 1px solid #d9534f;
+    border-radius: 6px;
+    padding: 0.8rem 1.5rem;
+    cursor: pointer;
+}
+.btn-danger:hover { background: #d9534f; color: white; }
