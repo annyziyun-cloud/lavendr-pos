@@ -28,14 +28,54 @@
             <div class="search-container">
                 <input type="text" id="phoneSearch" placeholder="請輸入顧客電話 (例: 0900000000)" class="search-input">
                 <button class="btn-primary" onclick="searchMember()">查詢會員</button>
+                <button class="btn-secondary" onclick="showRegistrationForm()">+ 建立新客檔案</button>
             </div>
 
-            <!-- 搜尋結果顯示區 (預設隱藏) -->
-            <div id="memberResult" class="member-result-box" style="display: none;">
+            <!-- 1. 新客註冊表單 (預設隱藏) -->
+            <div id="registrationForm" class="form-card" style="display: none;">
+                <div class="form-header">
+                    <h3>Lavend/r 新客資料登記</h3>
+                    <p>請協助顧客填寫以下基本資訊入會。</p>
+                </div>
+                <form onsubmit="submitRegistration(event)" class="form-body">
+                    <div class="form-group">
+                        <label>顧客姓名 *</label>
+                        <input type="text" id="regName" required placeholder="請輸入姓名">
+                    </div>
+                    <div class="form-group">
+                        <label>手機號碼 *</label>
+                        <input type="tel" id="regPhone" required placeholder="請輸入手機號碼">
+                    </div>
+                    <div class="form-group">
+                        <label>性別</label>
+                        <select id="regGender">
+                            <option value="">請選擇</option>
+                            <option value="女">女</option>
+                            <option value="男">男</option>
+                            <option value="不透露">不透露</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>生日 (不可修改) *</label>
+                        <input type="date" id="regBirthday" required>
+                    </div>
+                    <div class="form-group">
+                        <label>身分證/護照號碼 (不可修改) *</label>
+                        <input type="text" id="regId" required placeholder="作為帳號唯一憑證">
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn-text" onclick="cancelRegistration()">取消</button>
+                        <button type="submit" class="btn-primary">確認建立檔案</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- 2. 會員詳細資料方塊 (預設隱藏) -->
+            <div id="memberResult" class="profile-card" style="display: none;">
                 <!-- 這裡的內容會由 JavaScript 動態生成 -->
             </div>
 
-            <!-- 品牌會員制度展示 (預設顯示) -->
+            <!-- 3. 品牌會員制度展示 (預設顯示) -->
             <div class="tier-info-container" id="tierInfo">
                 <h3 class="subsection-title">Lavend/r 香氛會員等級</h3>
                 <div class="tier-cards">
@@ -46,7 +86,7 @@
                         <h4>微風草本 Seedling</h4>
                         <p class="tier-subtitle">初階會員</p>
                         <ul class="tier-benefits">
-                            <li>享有基礎點數累積。</li>
+                            <li>享有基礎點數累積</li>
                         </ul>
                     </div>
 
