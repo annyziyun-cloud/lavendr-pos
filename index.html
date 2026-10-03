@@ -11,7 +11,7 @@
     <nav class="top-nav">
         <h1>Lavend/r POS</h1>
         <div class="nav-buttons">
-            <button onclick="switchTab('tab-member')">會員接待</button>
+            <button onclick="switchTab('tab-member')" class="active">會員接待</button>
             <button onclick="switchTab('tab-quiz')">專屬調香</button>
             <button onclick="switchTab('tab-pos')">結帳工作台</button>
         </div>
@@ -20,7 +20,9 @@
     <!-- 主內容區 -->
     <main id="app-container">
         
-        <!-- 分頁一：會員接待 -->
+        <!-- ==============================================
+             分頁一：會員接待與基本資料
+             ============================================== -->
         <section id="tab-member" class="page-section active">
             <h2 class="section-title">Reception & Membership</h2>
             
@@ -114,12 +116,13 @@
                             <li>每年一次免費一對一調香服務</li>
                         </ul>
                     </div>
-
                 </div>
             </div>
         </section>
 
-        <!-- 分頁二：情境問卷與專屬調香 -->
+        <!-- ==============================================
+             分頁二：情境問卷與專屬調香
+             ============================================== -->
         <section id="tab-quiz" class="page-section" style="display: none;">
             <h2 class="section-title">Exclusive Formulation</h2>
 
@@ -127,7 +130,7 @@
             <div id="bookingDashboard">
                 <h3 class="subsection-title">📅 預約排程管理 (矩陣式)</h3>
                 
-                <!-- 新增：自由選擇日期的日曆輸入框 -->
+                <!-- 日期選擇器 -->
                 <div class="booking-controls" style="margin-bottom: 2rem;">
                     <label for="bookingDate" style="font-weight: bold; margin-right: 10px; color: var(--text-dark);">選擇預約日期：</label>
                     <input type="date" id="bookingDate" class="date-picker-input">
@@ -139,7 +142,7 @@
                 </div>
             </div>
 
-            <!-- 新增：專屬淺白色預約輸入彈窗 (預設隱藏) -->
+            <!-- 新增預約：專屬淺白色彈窗 (預設隱藏) -->
             <div id="bookingModal" class="custom-modal-overlay" style="display: none;">
                 <div class="custom-modal-box">
                     <h3 style="margin-top: 0; color: var(--text-dark);">新增預約</h3>
@@ -154,7 +157,7 @@
                 </div>
             </div>
 
-            <!-- 視圖 B：專屬調香工作台 (預設隱藏) -->
+            <!-- 視圖 B：專屬調香工作台 (點擊客人後顯示) -->
             <div id="workbenchView" class="form-card" style="display: none; max-width: 900px; border-top-color: #aebc9c;">
                 <div class="form-header" style="display: flex; justify-content: space-between; align-items: center;">
                     <div>
@@ -165,23 +168,25 @@
                 </div>
 
                 <div class="form-body">
-                    <!-- 步驟一：動態情境問卷 -->
+                    
+                    <!-- 步驟一：動態情境問卷 (由 JS 注入內容) -->
                     <div class="workbench-step" id="step1-quiz">
                         <h4>Step 1. 靈魂情境問卷</h4>
                         
-                        <!-- 問卷題目顯示區 -->
+                        <!-- 題目與按鈕顯示區 -->
                         <div id="quizContainer" class="quiz-container">
-                            <!-- JS 會在這裡一題一題印出題目與按鈕 -->
+                            <!-- JS 生成 -->
                         </div>
 
-                        <!-- 測驗結果顯示區 (預設隱藏) -->
+                        <!-- 測驗結果顯示區 -->
                         <div id="quizResult" style="display: none; padding: 1.5rem; background: #f9f9f9; border-radius: 8px;">
-                            <!-- JS 會在這裡印出推薦的香調 -->
+                            <!-- JS 生成 -->
                         </div>
                     </div>
 
-                    <!-- 步驟二與三：等問卷做完才會顯示 (預設隱藏) -->
+                    <!-- 步驟二與三：問卷完成後顯示 -->
                     <div id="postQuizSteps" style="display: none; animation: fadeIn 0.5s ease-out;">
+                        
                         <!-- 步驟二：細部調香 -->
                         <div class="workbench-step">
                             <h4>Step 2. 香氣微調 (由店員操作)</h4>
@@ -226,11 +231,16 @@
                     </div>
                 </div>
             </div>
+        </section>
 
-        <!-- 分頁三：POS 選物與結帳 -->
+        <!-- ==============================================
+             分頁三：結帳工作台
+             ============================================== -->
         <section id="tab-pos" class="page-section" style="display: none;">
-            <h2>購物車與雙軌取貨單</h2>
-            <p>這裡將會結合指定系列商品點選，並自動計算滿 2000 折 200 及滿件贈禮邏輯。</p>
+            <h2 class="section-title">POS Checkout</h2>
+            <div style="padding: 2rem; background: #fff; border-radius: 8px; border: 1px solid var(--border-line);">
+                <p>這裡將會結合指定系列商品點選，並自動計算滿 2000 折 200 及滿件贈禮邏輯。</p>
+            </div>
         </section>
 
     </main>
