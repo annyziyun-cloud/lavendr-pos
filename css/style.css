@@ -1,25 +1,31 @@
 /* 引入 Google 字體：優雅的明體 (標題) 與俐落的黑體 (內文) */
 @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600&family=Noto+Sans+TC:wght@300;400&display=swap');
 
-/* 定義 Lavend/r 專屬色票 (加入亮色與香檳金點綴) */
+/* 定義 Lavend/r 亮色系專屬色票 */
 :root {
-    --bg-dark: #3a393b;          /* 加深基礎底色以凸顯前方亮點 */
-    --text-light: #fdfdfd;       /* 提升文字明亮度 */
-    --lavender-primary: #b09ebb; /* 調亮莫蘭迪紫，增加按鈕吸睛度 */
-    --lavender-hover: #c4b4ce;
-    --accent-gold: #d4af37;      /* 新增：高質感的香檳金 */
-    --border-line: rgba(255, 255, 255, 0.2);
+    --bg-light: #faf9f8;         /* 溫暖的高級米白底色 */
+    --text-dark: #333333;        /* 俐落的深灰色文字 */
+    --text-muted: #888888;       /* 輔助說明的淺灰色 */
+    --lavender-primary: #8a7a8f; /* 莫蘭迪薰衣草紫 */
+    --lavender-hover: #6b5d6f;
+    --accent-gold: #d4af37;      /* 點綴用的香檳金 */
+    --card-bg: #ffffff;          /* 純白卡片底色 */
+    --border-line: rgba(0, 0, 0, 0.08); /* 柔和的淺色邊框 */
 }
 
 /* 基礎排版設定 */
 body {
     margin: 0;
     font-family: 'Noto Sans TC', sans-serif;
-    /* 升級：放射狀微光漸層背景，營造空間立體感 */
-    background: radial-gradient(circle at 15% 30%, #544f56 0%, var(--bg-dark) 100%);
-    color: var(--text-light);
+    background-color: var(--bg-light);
+    color: var(--text-dark);
     line-height: 1.6;
     min-height: 100vh;
+}
+
+/* 確保所有元素的內邊距不會撐破外框 (解決卡片重疊的關鍵) */
+* {
+    box-sizing: border-box;
 }
 
 h1, h2, h3 {
@@ -36,23 +42,23 @@ h1, h2, h3 {
     justify-content: space-between;
     align-items: center;
     padding: 1.2rem 3rem;
-    background: rgba(0, 0, 0, 0.25);
-    backdrop-filter: blur(10px);
+    background-color: #ffffff;
     border-bottom: 1px solid var(--border-line);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
 }
 
 .top-nav h1 {
     margin: 0;
     font-size: 1.8rem;
     letter-spacing: 4px;
-    text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    color: var(--lavender-primary);
 }
 
 /* 導覽列按鈕 */
 .nav-buttons button {
     background: transparent;
-    color: var(--text-light);
-    border: 1px solid var(--lavender-primary);
+    color: var(--text-dark);
+    border: 1px solid var(--border-line);
     padding: 0.6rem 1.5rem;
     margin-left: 15px;
     border-radius: 30px;
@@ -66,7 +72,7 @@ h1, h2, h3 {
 .nav-buttons button:hover {
     background: var(--lavender-primary);
     color: #fff;
-    box-shadow: 0 4px 15px rgba(176, 158, 187, 0.4);
+    border-color: var(--lavender-primary);
 }
 
 /* =========================================
@@ -89,7 +95,7 @@ h1, h2, h3 {
     margin-bottom: 2rem;
     border-bottom: 1px solid var(--border-line);
     padding-bottom: 1rem;
-    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    color: var(--text-dark);
 }
 
 .subsection-title {
@@ -110,11 +116,11 @@ h1, h2, h3 {
 .search-input {
     flex: 1;
     max-width: 400px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid var(--border-line);
+    background: #ffffff;
+    border: 1px solid #dddddd;
     border-radius: 6px;
     padding: 0.8rem 1rem;
-    color: var(--text-light);
+    color: var(--text-dark);
     font-size: 1rem;
     font-family: 'Noto Sans TC', sans-serif;
     transition: all 0.3s ease;
@@ -123,12 +129,11 @@ h1, h2, h3 {
 .search-input:focus {
     outline: none;
     border-color: var(--lavender-primary);
-    background: rgba(255, 255, 255, 0.1);
-    box-shadow: 0 0 12px rgba(176, 158, 187, 0.2);
+    box-shadow: 0 0 0 3px rgba(138, 122, 143, 0.1);
 }
 
 .btn-primary {
-    background: linear-gradient(135deg, var(--lavender-primary), #8a7a8f);
+    background: var(--lavender-primary);
     color: #fff;
     border: none;
     border-radius: 6px;
@@ -136,19 +141,18 @@ h1, h2, h3 {
     font-size: 1rem;
     cursor: pointer;
     letter-spacing: 2px;
-    box-shadow: 0 4px 15px rgba(138, 122, 143, 0.4);
     transition: all 0.3s ease;
 }
 
 .btn-primary:hover {
-    background: linear-gradient(135deg, var(--lavender-hover), var(--lavender-primary));
+    background: var(--lavender-hover);
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(176, 158, 187, 0.6);
+    box-shadow: 0 4px 12px rgba(138, 122, 143, 0.3);
 }
 
 /* 搜尋結果動態框 */
 .member-result-box {
-    background: linear-gradient(145deg, rgba(176, 158, 187, 0.15), rgba(0,0,0,0.2));
+    background: #ffffff;
     border: 1px solid var(--lavender-primary);
     border-radius: 8px;
     padding: 2rem 3rem;
@@ -156,87 +160,74 @@ h1, h2, h3 {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
     animation: fadeIn 0.4s ease-out;
 }
 
 /* =========================================
-   4. 會員卡片展示區 (圖文並茂與圓形融合版)
+   4. 會員卡片展示區 (純白簡約版)
    ========================================= */
 .tier-cards {
     display: grid;
+    /* 調整最小寬度，確保畫面縮小也能完美換行，不會擠壓 */
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 2rem;
-    align-items: start;
-    justify-items: center;
+    gap: 2.5rem;
+    align-items: stretch;
 }
 
-/* 玻璃質感卡片外框 */
+/* 純白卡片外框 */
 .tier-card {
-    width: 100%;
-    /* 稍微調高卡片的透白感，讓深色與白色圖片過渡更柔和 */
-    background: linear-gradient(145deg, rgba(255,255,255,0.12), rgba(255,255,255,0.03));
-    border: 1px solid rgba(255,255,255,0.15);
-    border-radius: 16px;
-    padding: 3rem 2rem 2.5rem;
+    background: var(--card-bg);
+    border: 1px solid var(--border-line);
+    border-radius: 12px;
+    padding: 3rem 2rem;
     text-align: center;
-    backdrop-filter: blur(12px);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-    transition: transform 0.4s ease, box-shadow 0.4s ease;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .tier-card:hover {
     transform: translateY(-8px);
-    box-shadow: 0 15px 40px rgba(176, 158, 187, 0.3);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
 }
 
-/* 頂部專屬飾條：從你的花圈設計中提取莫蘭迪色調 */
-.tier-card.seedling { border-top: 5px solid #aebc9c; } /* 莫蘭迪草綠 */
-.tier-card.dewdrop { border-top: 5px solid #d4a5a5; }  /* 乾燥玫瑰粉 */
+/* 頂部專屬色飾條 */
+.tier-card.seedling { border-top: 4px solid #aebc9c; }
+.tier-card.dewdrop { border-top: 4px solid #d4a5a5; }
 .tier-card.lavender-vip {
-    border-top: 5px solid var(--accent-gold); /* 尊爵香檳金 */
-    background: linear-gradient(145deg, rgba(212, 175, 55, 0.1), rgba(255,255,255,0.02));
+    border-top: 4px solid var(--accent-gold);
+    /* VIP 卡片擁有極微弱的香檳金背景 */
+    background: linear-gradient(180deg, rgba(212, 175, 55, 0.03) 0%, #ffffff 100%);
 }
 
-/* 核心優化：讓圖片變成優雅的圓形徽章 */
+/* 卡片內的圓形圖片 */
 .tier-image {
-    width: 85%; /* 稍微縮小，增加留白呼吸感 */
-    aspect-ratio: 1 / 1; /* 強制保持正方形比例 */
-    border-radius: 50%; /* 裁切成完美正圓形 */
+    width: 75%;
+    aspect-ratio: 1 / 1;
+    border-radius: 50%;
     margin: 0 auto 2rem auto;
     object-fit: cover;
-    background-color: #fff; /* 確保圓形邊緣純淨 */
     display: block;
-    /* 加上多層次陰影，營造徽章浮雕感 */
-    box-shadow: 
-        0 0 0 6px rgba(255, 255, 255, 0.08), 
-        0 10px 25px rgba(0, 0, 0, 0.3); 
-    transition: transform 0.5s ease;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06); 
+    transition: transform 0.4s ease;
 }
 
-/* 當滑鼠移至卡片時，花圈會微微放大與旋轉 */
 .tier-card:hover .tier-image {
-    transform: scale(1.05) rotate(3deg);
-}
-
-/* 保留文字 Icon 設定 (若未來不用圖片時可替換) */
-.tier-icon {
-    font-size: 3rem;
-    margin-bottom: 1rem;
-    filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2));
+    transform: scale(1.03);
 }
 
 /* 會員文字與權益排版 */
 .tier-card h4 {
     margin: 0 0 0.5rem 0;
-    font-size: 1.4rem;
+    font-size: 1.3rem;
     letter-spacing: 1px;
+    color: var(--text-dark);
 }
 
 .tier-subtitle {
-    color: #bbb;
+    color: var(--text-muted);
     font-size: 0.95rem;
-    margin-bottom: 1.8rem;
+    margin-bottom: 2rem;
 }
 
 .tier-benefits {
@@ -245,10 +236,17 @@ h1, h2, h3 {
     text-align: left;
     font-size: 0.95rem;
     line-height: 1.8;
+    color: #555555;
 }
 
 .tier-benefits li::before {
     content: '✦ ';
+    color: var(--lavender-primary);
+    font-size: 1rem;
+    margin-right: 4px;
+}
+
+/* 特殊處理 VIP 列表星號 */
+.tier-card.lavender-vip .tier-benefits li::before {
     color: var(--accent-gold);
-    font-size: 1.1rem;
 }
