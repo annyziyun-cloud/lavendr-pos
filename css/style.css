@@ -1,23 +1,25 @@
 /* 引入 Google 字體：優雅的明體 (標題) 與俐落的黑體 (內文) */
 @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600&family=Noto+Sans+TC:wght@300;400&display=swap');
 
-/* 定義 Lavend/r 專屬色票 (莫蘭迪色系) */
+/* 定義 Lavend/r 專屬色票 (加入亮色與香檳金點綴) */
 :root {
-    --bg-dark: #565554;          /* 沉靜的深灰泥色背景 */
-    --text-light: #f5f5f5;       /* 柔和的米白色文字 */
-    --lavender-primary: #8a7a8f; /* 莫蘭迪薰衣草紫 */
-    --lavender-hover: #6b5d6f;   /* 按鈕點擊時的深紫色 */
-    --card-bg: rgba(255, 255, 255, 0.05); /* 微透光的玻璃質感 */
-    --border-line: rgba(255, 255, 255, 0.15);
+    --bg-dark: #3a393b;          /* 加深基礎底色以凸顯前方亮點 */
+    --text-light: #fdfdfd;       /* 提升文字明亮度 */
+    --lavender-primary: #b09ebb; /* 調亮莫蘭迪紫，增加按鈕吸睛度 */
+    --lavender-hover: #c4b4ce;
+    --accent-gold: #d4af37;      /* 新增：高質感的香檳金 */
+    --border-line: rgba(255, 255, 255, 0.2);
 }
 
 /* 基礎排版設定 */
 body {
     margin: 0;
     font-family: 'Noto Sans TC', sans-serif;
-    background-color: var(--bg-dark);
+    /* 升級：放射狀微光漸層背景，營造空間立體感 */
+    background: radial-gradient(circle at 15% 30%, #544f56 0%, var(--bg-dark) 100%);
     color: var(--text-light);
     line-height: 1.6;
+    min-height: 100vh;
 }
 
 h1, h2, h3 {
@@ -32,7 +34,8 @@ h1, h2, h3 {
     justify-content: space-between;
     align-items: center;
     padding: 1.2rem 3rem;
-    background-color: rgba(0, 0, 0, 0.15);
+    background: rgba(0, 0, 0, 0.25);
+    backdrop-filter: blur(10px);
     border-bottom: 1px solid var(--border-line);
 }
 
@@ -40,9 +43,10 @@ h1, h2, h3 {
     margin: 0;
     font-size: 1.8rem;
     letter-spacing: 4px;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.3);
 }
 
-/* 導覽列按鈕：細緻的線條與 Hover 效果 */
+/* 導覽列按鈕 */
 .nav-buttons button {
     background: transparent;
     color: var(--text-light);
@@ -60,7 +64,7 @@ h1, h2, h3 {
 .nav-buttons button:hover {
     background: var(--lavender-primary);
     color: #fff;
-    box-shadow: 0 4px 12px rgba(138, 122, 143, 0.3);
+    box-shadow: 0 4px 15px rgba(176, 158, 187, 0.4);
 }
 
 /* 各分頁的主要內容區塊 */
@@ -68,8 +72,7 @@ h1, h2, h3 {
     padding: 3rem 4rem;
     max-width: 1200px;
     margin: 0 auto;
-    /* 加入淡入動畫，讓店員切換分頁時有流暢的高級感 */
-    animation: fadeIn 0.4s ease-out forwards; 
+    animation: fadeIn 0.5s ease-out forwards; 
 }
 
 @keyframes fadeIn {
@@ -78,12 +81,12 @@ h1, h2, h3 {
 }
 
 /* --- 分頁一：會員接待專屬樣式 --- */
-
 .section-title {
     font-size: 2rem;
     margin-bottom: 2rem;
     border-bottom: 1px solid var(--border-line);
     padding-bottom: 1rem;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
 }
 
 .subsection-title {
@@ -102,35 +105,42 @@ h1, h2, h3 {
 .search-input {
     flex: 1;
     max-width: 400px;
-    background: transparent;
+    /* 升級：搜尋框加入微透光感 */
+    background: rgba(255, 255, 255, 0.05);
     border: 1px solid var(--border-line);
-    border-radius: 4px;
+    border-radius: 6px;
     padding: 0.8rem 1rem;
     color: var(--text-light);
     font-size: 1rem;
     font-family: 'Noto Sans TC', sans-serif;
-    transition: border 0.3s ease;
+    transition: all 0.3s ease;
 }
 
 .search-input:focus {
     outline: none;
     border-color: var(--lavender-primary);
+    background: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 12px rgba(176, 158, 187, 0.2);
 }
 
+/* 升級：按鈕加入漸層與發光效果 */
 .btn-primary {
-    background: var(--lavender-primary);
+    background: linear-gradient(135deg, var(--lavender-primary), #8a7a8f);
     color: #fff;
     border: none;
-    border-radius: 4px;
+    border-radius: 6px;
     padding: 0.8rem 2rem;
     font-size: 1rem;
     cursor: pointer;
     letter-spacing: 2px;
-    transition: background 0.3s ease;
+    box-shadow: 0 4px 15px rgba(138, 122, 143, 0.4);
+    transition: all 0.3s ease;
 }
 
 .btn-primary:hover {
-    background: var(--lavender-hover);
+    background: linear-gradient(135deg, var(--lavender-hover), var(--lavender-primary));
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(176, 158, 187, 0.6);
 }
 
 /* 會員卡片展示區 */
@@ -140,35 +150,54 @@ h1, h2, h3 {
     gap: 2rem;
 }
 
+/* 升級：玻璃質感卡片 */
 .tier-card {
-    background: var(--card-bg);
-    border: 1px solid var(--border-line);
+    background: linear-gradient(145deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02));
+    border: 1px solid rgba(255,255,255,0.1);
     border-radius: 12px;
-    padding: 2rem;
+    padding: 2.5rem 2rem;
     text-align: center;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .tier-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    transform: translateY(-8px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+}
+
+/* 新增：為每張卡片加入專屬顏色的頂部亮色飾條 */
+.tier-card.seedling {
+    border-top: 4px solid #8fbc8f; /* 柔和草綠色 */
+}
+
+.tier-card.dewdrop {
+    border-top: 4px solid #87ceeb; /* 清透水藍色 */
+}
+
+.tier-card.lavender-vip {
+    border-top: 4px solid var(--accent-gold); /* 尊爵香檳金 */
+    /* VIP 卡片擁有專屬的微金光背景 */
+    background: linear-gradient(145deg, rgba(212, 175, 55, 0.08), rgba(255,255,255,0.02));
 }
 
 .tier-icon {
-    font-size: 2.5rem;
+    font-size: 3rem;
     margin-bottom: 1rem;
+    filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2));
 }
 
 .tier-card h4 {
     margin: 0 0 0.5rem 0;
-    font-size: 1.3rem;
+    font-size: 1.4rem;
     letter-spacing: 1px;
 }
 
 .tier-subtitle {
-    color: #aaa;
-    font-size: 0.9rem;
-    margin-bottom: 1.5rem;
+    color: #bbb;
+    font-size: 0.95rem;
+    margin-bottom: 1.8rem;
 }
 
 .tier-benefits {
@@ -179,20 +208,23 @@ h1, h2, h3 {
     line-height: 1.8;
 }
 
+/* 升級：將條列符號改為香檳金十字星，增加高級感 */
 .tier-benefits li::before {
     content: '✦ ';
-    color: var(--lavender-primary);
+    color: var(--accent-gold);
+    font-size: 1.1rem;
 }
 
 /* 搜尋結果動態框 */
 .member-result-box {
-    background: rgba(138, 122, 143, 0.1);
+    background: linear-gradient(145deg, rgba(176, 158, 187, 0.15), rgba(0,0,0,0.2));
     border: 1px solid var(--lavender-primary);
     border-radius: 8px;
-    padding: 2rem;
+    padding: 2rem 3rem;
     margin-bottom: 3rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
     animation: fadeIn 0.4s ease-out;
 }
