@@ -611,19 +611,135 @@ function confirmBooking() {
 }
 
 /* =======================================================
-   7. 分頁二：專屬調香工作台邏輯
+   7. 分頁二：專屬調香工作台邏輯 (問卷引擎)
    ======================================================= */
+let quizQueue = []; // 用來排隊題目的陣列
+let currentQuestionIndex = 0; // 目前播到第幾題
+let selectedOptionValue = null; // 當前選擇的答案
+
 function openWorkbench(phone, date, slot) {
     const member = memberDatabase[phone];
     
+    // 切換畫面
     document.getElementById('bookingDashboard').style.display = 'none';
     document.getElementById('workbenchView').style.display = 'block';
 
+    // 帶入客製化資訊
     document.getElementById('wbCustomerName').textContent = `調香處方箋 - 👤 ${member.name}`;
     document.getElementById('wbCustomerPhone').textContent = `時段：${date} ${slot} ｜ 電話：${member.phone}`;
+    
+    // 啟動問卷系統
+    startQuiz(phone);
 }
 
 function closeWorkbench() {
     document.getElementById('workbenchView').style.display = 'none';
     document.getElementById('bookingDashboard').style.display = 'block';
+}
+
+// --- 問卷引擎核心 ---
+function startQuiz(phone) {
+    // 1. 初始化設定
+    currentQuizSession.customerPhone = phone;
+    currentQuizSession.answers = {};
+    
+    // 2. 將 Phase 1 (Q1~Q6) 放入題庫佇列
+    quizQueue = [...scentQuizData.baseQuestions];
+    currentQuestionIndex = 0;
+
+    // 3. 重置 UI 狀態
+    document.getElementById('quizContainer').style.display = 'block';
+    document.getElementById('quizResult').style.display = 'none';
+    document.getElementById('postQuizSteps').style.display = 'none';
+
+    // 4. 印出第一題
+    renderQuestion();
+}
+
+function renderQuestion() {
+    const container = document.getElementById('quizContainer');
+    const questionData = quizQueue[currentQuestionIndex];
+    selectedOptionValue = null; // 清空選擇狀態
+
+    let optionsHtml = '';
+    questionData.options.forEach((opt, index) => {
+        optionsHtml += `<button class="quiz-option-btn" id="opt_${index}" onclick="selectOption(${index}, '${opt.value}')">${opt.label}</button>`;
+    });
+
+    container.innerHTML = `
+        <div class="quiz-question" style="animation: fadeIn 0.3s ease-out;">
+            <span style="color: var(--lavender-primary); margin-right: 8px;">${questionData.id}.</span>${questionData.question}
+        </div>
+        <div class="quiz-options" style="animation: fadeIn 0.4s ease-out;">
+            ${optionsHtml}
+        </div>
+        <div class="quiz-actions">
+            <button class="btn-primary" onclick="nextQuestion()" id="nextBtn" disabled style="opacity: 0.5; cursor: not-allowed;">下一題 ➔</button>
+        </div>
+    `;
+}
+
+// 點擊選項觸發
+function selectOption(index, value) {
+    const buttons = document.querySelectorAll('.quiz-option-btn');
+    buttons.forEach(btn => btn.classList.remove('selected'));
+    document.getElementById(`opt_${index}`).classList.add('selected');
+
+    selectedOptionValue = value;
+
+    // 解鎖「下一題」按鈕
+    const nextBtn = document.getElementById('nextBtn');
+    nextBtn.disabled = false;
+    nextBtn.style.opacity = '1';
+    nextBtn.style.cursor = 'pointer';
+}
+
+// 點擊下一題觸發
+function nextQuestion() {
+    if (!selectedOptionValue) return;
+
+    const currentQ = quizQueue[currentQuestionIndex];
+    // 將客人的答案存入暫存區
+    currentQuizSession.answers[currentQ.id] = selectedOptionValue;
+
+    // ★ 關鍵分流邏輯：如果是 Q1，把對應的支線題目加到陣列尾端
+    if (currentQ.id === 'Q1') {
+        const branchQuestions = scentQuizData.branches[selectedOptionValue];
+        if (branchQuestions && branchQuestions.length > 0) {
+            quizQueue = quizQueue.concat(branchQuestions);
+        }
+    }
+
+    currentQuestionIndex++;
+
+    // 判斷是否還有題目
+    if (currentQuestionIndex < quizQueue.length) {
+        renderQuestion();
+    } else {
+        finishQuiz(); // 沒題目了，顯示結果
+    }
+}
+
+// 問卷結束，生成處方箋
+function finishQuiz() {
+    document.getElementById('quizContainer').style.display = 'none';
+    const resultBox = document.getElementById('quizResult');
+    resultBox.style.display = 'block';
+
+    // 這裡我們先模擬演算法算出的結果，等資料庫齊全後，我們再來寫真實的配對邏輯！
+    resultBox.innerHTML = `
+        <h4 style="color: var(--lavender-primary); margin-top:0;">✨ 系統分析完成</h4>
+        <p style="color: var(--text-dark); margin-bottom: 5px;">根據顧客的潛意識偏好，系統推薦以下基調：</p>
+        <select class="form-group" style="margin-top: 10px; width: 100%; padding: 0.8rem; border-color: var(--lavender-primary); font-weight: bold;">
+            <option>冷調木質與茶 (The Intellectual Woods) - 契合度 98%</option>
+            <option>海洋礦物與晨露 (The Mineral Horizon) - 契合度 85%</option>
+            <option>純淨皂香與柔白麝香 (The Second Skin) - 契合度 72%</option>
+        </select>
+        <p style="font-size: 0.85rem; color: #888; margin-top: 15px;">
+            (後台偵測紀錄：Q1選了 ${currentQuizSession.answers['Q1']} 支線，已排除防雷香材)
+        </p>
+    `;
+
+    // 展開 Step 2 與 Step 3 讓店員接續操作
+    document.getElementById('postQuizSteps').style.display = 'block';
 }
