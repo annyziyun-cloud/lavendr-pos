@@ -97,13 +97,12 @@ const scentQuizData = {
         {
             id: 'Q6',
             question: '最後，為了確保劇本的完美，有什麼氣味元素是你希望「絕對不要出現」的？(可多選)',
-            multiple: true, // ★ 告訴系統這題是多選題
+            multiple: true,
             options: [
                 { label: '過於甜膩的糖果/香草味', value: 'A' },
                 { label: '濃烈的白花香（如茉莉、晚香玉）', value: 'B' },
                 { label: '帶有侵略性的辛香料味', value: 'C' },
                 { label: '潮濕的泥土或苔蘚味', value: 'D' },
-                // ★ exclusive: true 代表排他性 (選了這個就不能選別的)
                 { label: '毫無禁忌，請給我驚喜', value: 'E', exclusive: true } 
             ]
         }
@@ -143,15 +142,9 @@ const scentQuizData = {
                 ]
             }
         ],
-        'B': [ 
-            /* 預留給支線 B 題目... */ 
-        ],
-        'C': [ 
-            /* 預留給支線 C 題目... */ 
-        ],
-        'D': [ 
-            /* 預留給支線 D 題目... */ 
-        ]
+        'B': [ /* 預留給支線 B 題目... */ ],
+        'C': [ /* 預留給支線 C 題目... */ ],
+        'D': [ /* 預留給支線 D 題目... */ ]
     }
 };
 
@@ -216,8 +209,8 @@ const fragranceProfiles = {
 // 3. 顧客當前作答紀錄 (暫存區)
 let currentQuizSession = {
     customerPhone: '',
-    answers: {},       // 存放客人的選項，如 { 'Q1': 'A', 'Q5': 'C', 'A1': '2' }
-    calculatedResult: null // 存放最終算出來的配方
+    answers: {},       
+    calculatedResult: null 
 };
 
 // 記住店員「現在正在服務哪一位客人」，切換分頁時才能連動
@@ -426,7 +419,7 @@ function renderAccountSettings() {
     resultBox.innerHTML = `
         <div style="width: 100%;">
             <div class="profile-header" style="border-bottom:none;">
-                <h3 style="margin:0;">⚙️️ 調整會員資料</h3>
+                <h3 style="margin:0;">⚙ 調整會員資料</h3>
             </div>
             <div class="form-body" style="padding: 0;">
                 <div class="form-group">
@@ -613,11 +606,11 @@ function confirmBooking() {
 }
 
 /* =======================================================
-   7. 分頁二：專屬調香工作台邏輯 (問卷引擎)
+   7. 分頁二：專屬調香工作台邏輯 (問卷引擎核心)
    ======================================================= */
-let quizQueue = []; // 用來排隊題目的陣列
-let currentQuestionIndex = 0; // 目前播到第幾題
-let selectedOptionValue = null; // 當前選擇的答案
+let quizQueue = []; 
+let currentQuestionIndex = 0; 
+let selectedOptionValues = []; 
 
 function openWorkbench(phone, date, slot) {
     const member = memberDatabase[phone];
@@ -639,33 +632,6 @@ function closeWorkbench() {
     document.getElementById('bookingDashboard').style.display = 'block';
 }
 
-// --- 問卷引擎核心 ---
-function startQuiz(phone) {
-    // 1. 初始化設定
-    currentQuizSession.customerPhone = phone;
-    currentQuizSession.answers = {};
-    
-    // 2. 將 Phase 1 (Q1~Q6) 放入題庫佇列
-    quizQueue = [...scentQuizData.baseQuestions];
-    currentQuestionIndex = 0;
-
-    // 3. 重置 UI 狀態
-    document.getElementById('quizContainer').style.display = 'block';
-    document.getElementById('quizResult').style.display = 'none';
-    document.getElementById('postQuizSteps').style.display = 'none';
-
-    // 4. 印出第一題
-    renderQuestion();
-}
-
-function renderQuestion() {
-    const container = document.getElementById('quizContainer');
-    const questionData = quizQueue[currentQuestionIndex];
-    // --- 問卷引擎核心 (支援單選、多選與排他邏輯) ---
-let quizQueue = []; 
-let currentQuestionIndex = 0; 
-let selectedOptionValues = []; // ★ 改用陣列來儲存答案 (支援多選)
-
 function startQuiz(phone) {
     currentQuizSession.customerPhone = phone;
     currentQuizSession.answers = {};
@@ -683,9 +649,8 @@ function startQuiz(phone) {
 function renderQuestion() {
     const container = document.getElementById('quizContainer');
     const questionData = quizQueue[currentQuestionIndex];
-    selectedOptionValues = []; // 清空當前選擇
+    selectedOptionValues = []; 
 
-    // 判斷是否為多選題
     const isMultiple = questionData.multiple ? true : false;
 
     let optionsHtml = '';
@@ -707,28 +672,23 @@ function renderQuestion() {
     `;
 }
 
-// 點擊選項觸發 (加入多選邏輯)
 function selectOption(index, value, isMultiple, isExclusive) {
     const btn = document.getElementById(`opt_${index}`);
     const nextBtn = document.getElementById('nextBtn');
     const currentQ = quizQueue[currentQuestionIndex];
 
     if (!isMultiple) {
-        // 【單選題邏輯】
         const buttons = document.querySelectorAll('.quiz-option-btn');
         buttons.forEach(b => b.classList.remove('selected'));
         btn.classList.add('selected');
         selectedOptionValues = [value];
     } else {
-        // 【多選題邏輯】
         if (isExclusive) {
-            // 若點擊「毫無禁忌(排他)」，清空並取消其他選項
             const buttons = document.querySelectorAll('.quiz-option-btn');
             buttons.forEach(b => b.classList.remove('selected'));
             btn.classList.add('selected');
             selectedOptionValues = [value];
         } else {
-            // 若點擊一般選項，先檢查並清除「毫無禁忌(排他)」的狀態
             currentQ.options.forEach((opt, idx) => {
                 if(opt.exclusive) {
                     document.getElementById(`opt_${idx}`).classList.remove('selected');
@@ -736,18 +696,16 @@ function selectOption(index, value, isMultiple, isExclusive) {
                 }
             });
 
-            // 切換點擊狀態 (Toggle)
             if (btn.classList.contains('selected')) {
                 btn.classList.remove('selected');
-                selectedOptionValues = selectedOptionValues.filter(v => v !== value); // 移除答案
+                selectedOptionValues = selectedOptionValues.filter(v => v !== value); 
             } else {
                 btn.classList.add('selected');
-                selectedOptionValues.push(value); // 加入答案
+                selectedOptionValues.push(value); 
             }
         }
     }
 
-    // 判斷是否解鎖「下一題」按鈕
     if (selectedOptionValues.length > 0) {
         nextBtn.disabled = false;
         nextBtn.style.opacity = '1';
@@ -759,16 +717,13 @@ function selectOption(index, value, isMultiple, isExclusive) {
     }
 }
 
-// 點擊下一題觸發
 function nextQuestion() {
     if (selectedOptionValues.length === 0) return;
 
     const currentQ = quizQueue[currentQuestionIndex];
     
-    // 將客人的答案存入暫存區 (如果是單選存字串，多選存陣列)
     currentQuizSession.answers[currentQ.id] = currentQ.multiple ? [...selectedOptionValues] : selectedOptionValues[0];
 
-    // ★ 關鍵分流邏輯：如果是 Q1，把對應的支線題目加到陣列尾端
     if (currentQ.id === 'Q1') {
         const branchChoice = selectedOptionValues[0];
         const branchQuestions = scentQuizData.branches[branchChoice];
@@ -779,21 +734,18 @@ function nextQuestion() {
 
     currentQuestionIndex++;
 
-    // 判斷是否還有題目
     if (currentQuestionIndex < quizQueue.length) {
         renderQuestion();
     } else {
-        finishQuiz(); // 沒題目了，顯示結果
+        finishQuiz(); 
     }
 }
 
-// 問卷結束，生成處方箋
 function finishQuiz() {
     document.getElementById('quizContainer').style.display = 'none';
     const resultBox = document.getElementById('quizResult');
     resultBox.style.display = 'block';
 
-    // 模擬演算法算出的結果
     resultBox.innerHTML = `
         <h4 style="color: var(--lavender-primary); margin-top:0;">✨ 系統分析完成</h4>
         <p style="color: var(--text-dark); margin-bottom: 5px;">根據顧客的潛意識偏好，系統推薦以下基調：</p>
@@ -807,23 +759,5 @@ function finishQuiz() {
         </p>
     `;
 
-    document.getElementById('postQuizSteps').style.display = 'block';
-}
-
-    // 這裡我們先模擬演算法算出的結果，等資料庫齊全後，我們再來寫真實的配對邏輯！
-    resultBox.innerHTML = `
-        <h4 style="color: var(--lavender-primary); margin-top:0;">✨ 系統分析完成</h4>
-        <p style="color: var(--text-dark); margin-bottom: 5px;">根據顧客的潛意識偏好，系統推薦以下基調：</p>
-        <select class="form-group" style="margin-top: 10px; width: 100%; padding: 0.8rem; border-color: var(--lavender-primary); font-weight: bold;">
-            <option>冷調木質與茶 (The Intellectual Woods) - 契合度 98%</option>
-            <option>海洋礦物與晨露 (The Mineral Horizon) - 契合度 85%</option>
-            <option>純淨皂香與柔白麝香 (The Second Skin) - 契合度 72%</option>
-        </select>
-        <p style="font-size: 0.85rem; color: #888; margin-top: 15px;">
-            (後台偵測紀錄：Q1選了 ${currentQuizSession.answers['Q1']} 支線，已排除防雷香材)
-        </p>
-    `;
-
-    // 展開 Step 2 與 Step 3 讓店員接續操作
     document.getElementById('postQuizSteps').style.display = 'block';
 }
