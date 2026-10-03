@@ -165,64 +165,67 @@
                 </div>
 
                 <div class="form-body">
-                    <!-- 步驟一：情境問卷 -->
-                    <div class="workbench-step">
-                        <h4>Step 1. 靈魂情境問卷 (架構模擬)</h4>
-                        <p style="color: var(--text-muted); font-size: 0.9rem;">(未來將在此擴充 Likert Scale 量表與情境題，系統將自動推薦 TOP 3 香調)</p>
-                        <div style="padding: 1rem; background: #f9f9f9; border-radius: 8px;">
-                            <label>模擬系統計算結果，請選擇基調：</label>
-                            <select class="form-group" style="margin-top: 10px; width: 100%;">
-                                <option>玫瑰花香 (推薦度 98%)</option>
-                                <option>晨霧木質 (推薦度 85%)</option>
-                                <option>雨後清晨 (推薦度 72%)</option>
-                            </select>
+                    <!-- 步驟一：動態情境問卷 -->
+                    <div class="workbench-step" id="step1-quiz">
+                        <h4>Step 1. 靈魂情境問卷</h4>
+                        
+                        <!-- 問卷題目顯示區 -->
+                        <div id="quizContainer" class="quiz-container">
+                            <!-- JS 會在這裡一題一題印出題目與按鈕 -->
+                        </div>
+
+                        <!-- 測驗結果顯示區 (預設隱藏) -->
+                        <div id="quizResult" style="display: none; padding: 1.5rem; background: #f9f9f9; border-radius: 8px;">
+                            <!-- JS 會在這裡印出推薦的香調 -->
                         </div>
                     </div>
 
-                    <!-- 步驟二：細部調香 -->
-                    <div class="workbench-step">
-                        <h4>Step 2. 香氣微調 (由店員操作)</h4>
-                        <div style="display: flex; gap: 15px;">
-                            <div class="form-group" style="flex: 1;">
-                                <label>前調加強</label>
-                                <input type="text" placeholder="例: 佛手柑 +1滴">
-                            </div>
-                            <div class="form-group" style="flex: 1;">
-                                <label>中調加強</label>
-                                <input type="text" placeholder="例: 保加利亞玫瑰">
-                            </div>
-                            <div class="form-group" style="flex: 1;">
-                                <label>後調加強</label>
-                                <input type="text" placeholder="例: 琥珀">
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- 步驟三：瓶身包裝定裝 -->
-                    <div class="workbench-step">
-                        <h4>Step 3. 專屬包裝定裝</h4>
-                        <div style="display: flex; gap: 15px;">
-                            <div class="form-group" style="flex: 2;">
-                                <label>客製化瓶身刻字 (英文/數字)</label>
-                                <input type="text" placeholder="請輸入想刻上的名字">
-                            </div>
-                            <div class="form-group" style="flex: 1;">
-                                <label>香水瓶樣式</label>
-                                <select><option>復古方瓶</option><option>極簡圓瓶</option></select>
-                            </div>
-                            <div class="form-group" style="flex: 1;">
-                                <label>小吊牌設計</label>
-                                <select><option>黃銅金屬</option><option>霧面壓克力</option></select>
+                    <!-- 步驟二與三：等問卷做完才會顯示 (預設隱藏) -->
+                    <div id="postQuizSteps" style="display: none; animation: fadeIn 0.5s ease-out;">
+                        <!-- 步驟二：細部調香 -->
+                        <div class="workbench-step">
+                            <h4>Step 2. 香氣微調 (由店員操作)</h4>
+                            <div style="display: flex; gap: 15px;">
+                                <div class="form-group" style="flex: 1;">
+                                    <label>前調加強</label>
+                                    <input type="text" placeholder="例: 佛手柑 +1滴">
+                                </div>
+                                <div class="form-group" style="flex: 1;">
+                                    <label>中調加強</label>
+                                    <input type="text" placeholder="例: 保加利亞玫瑰">
+                                </div>
+                                <div class="form-group" style="flex: 1;">
+                                    <label>後調加強</label>
+                                    <input type="text" placeholder="例: 琥珀">
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <div class="form-actions">
-                        <button class="btn-primary" onclick="alert('處方箋已儲存！(未來將連動至結帳台)')">生成專屬香水</button>
+                        <!-- 步驟三：瓶身包裝定裝 -->
+                        <div class="workbench-step">
+                            <h4>Step 3. 專屬包裝定裝</h4>
+                            <div style="display: flex; gap: 15px;">
+                                <div class="form-group" style="flex: 2;">
+                                    <label>客製化瓶身刻字 (英文/數字)</label>
+                                    <input type="text" placeholder="請輸入想刻上的名字">
+                                </div>
+                                <div class="form-group" style="flex: 1;">
+                                    <label>香水瓶樣式</label>
+                                    <select><option>復古方瓶</option><option>極簡圓瓶</option></select>
+                                </div>
+                                <div class="form-group" style="flex: 1;">
+                                    <label>小吊牌設計</label>
+                                    <select><option>黃銅金屬</option><option>霧面壓克力</option></select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <button class="btn-primary" onclick="alert('處方箋已儲存！(未來將連動至結帳台)')">生成專屬香水</button>
+                        </div>
                     </div>
                 </div>
             </div>
-        </section>
 
         <!-- 分頁三：POS 選物與結帳 -->
         <section id="tab-pos" class="page-section" style="display: none;">
