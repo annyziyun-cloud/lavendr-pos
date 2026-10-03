@@ -228,3 +228,13 @@ h1, h2, h3 {
     box-shadow: 0 8px 24px rgba(0,0,0,0.2);
     animation: fadeIn 0.4s ease-out;
 }
+
+/* 會員卡片內的圖片樣式 */
+.tier-image {
+    width: 100%;
+    height: auto;
+    border-radius: 8px; /* 柔和的邊角 */
+    margin-bottom: 1.5rem; /* 與下方文字拉開呼吸空間 */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); /* 讓圖片本身帶有微立體感 */
+    object-fit: cover; /* 確保圖片比例不變形 */
+}
