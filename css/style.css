@@ -28,7 +28,9 @@ h1, h2, h3 {
     font-weight: 400;
 }
 
-/* 頂部導覽列：店員工作台 Header */
+/* =========================================
+   1. 頂部導覽列 (Header)
+   ========================================= */
 .top-nav {
     display: flex;
     justify-content: space-between;
@@ -67,7 +69,9 @@ h1, h2, h3 {
     box-shadow: 0 4px 15px rgba(176, 158, 187, 0.4);
 }
 
-/* 各分頁的主要內容區塊 */
+/* =========================================
+   2. 共用分頁區塊與動畫
+   ========================================= */
 .page-section {
     padding: 3rem 4rem;
     max-width: 1200px;
@@ -80,7 +84,6 @@ h1, h2, h3 {
     to { opacity: 1; transform: translateY(0); }
 }
 
-/* --- 分頁一：會員接待專屬樣式 --- */
 .section-title {
     font-size: 2rem;
     margin-bottom: 2rem;
@@ -95,7 +98,9 @@ h1, h2, h3 {
     color: var(--lavender-primary);
 }
 
-/* 搜尋區塊 */
+/* =========================================
+   3. 搜尋與按鈕區塊
+   ========================================= */
 .search-container {
     display: flex;
     gap: 15px;
@@ -105,7 +110,6 @@ h1, h2, h3 {
 .search-input {
     flex: 1;
     max-width: 400px;
-    /* 升級：搜尋框加入微透光感 */
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid var(--border-line);
     border-radius: 6px;
@@ -123,7 +127,6 @@ h1, h2, h3 {
     box-shadow: 0 0 12px rgba(176, 158, 187, 0.2);
 }
 
-/* 升級：按鈕加入漸層與發光效果 */
 .btn-primary {
     background: linear-gradient(135deg, var(--lavender-primary), #8a7a8f);
     color: #fff;
@@ -143,51 +146,87 @@ h1, h2, h3 {
     box-shadow: 0 6px 20px rgba(176, 158, 187, 0.6);
 }
 
-/* 會員卡片展示區 */
+/* 搜尋結果動態框 */
+.member-result-box {
+    background: linear-gradient(145deg, rgba(176, 158, 187, 0.15), rgba(0,0,0,0.2));
+    border: 1px solid var(--lavender-primary);
+    border-radius: 8px;
+    padding: 2rem 3rem;
+    margin-bottom: 3rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+    animation: fadeIn 0.4s ease-out;
+}
+
+/* =========================================
+   4. 會員卡片展示區 (圖文並茂與圓形融合版)
+   ========================================= */
 .tier-cards {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 2rem;
+    align-items: start;
+    justify-items: center;
 }
 
-/* 升級：玻璃質感卡片 */
+/* 玻璃質感卡片外框 */
 .tier-card {
-    background: linear-gradient(145deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02));
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 12px;
-    padding: 2.5rem 2rem;
+    width: 100%;
+    /* 稍微調高卡片的透白感，讓深色與白色圖片過渡更柔和 */
+    background: linear-gradient(145deg, rgba(255,255,255,0.12), rgba(255,255,255,0.03));
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 16px;
+    padding: 3rem 2rem 2.5rem;
     text-align: center;
-    backdrop-filter: blur(10px);
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    backdrop-filter: blur(12px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    transition: transform 0.4s ease, box-shadow 0.4s ease;
 }
 
 .tier-card:hover {
     transform: translateY(-8px);
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 15px 40px rgba(176, 158, 187, 0.3);
 }
 
-/* 新增：為每張卡片加入專屬顏色的頂部亮色飾條 */
-.tier-card.seedling {
-    border-top: 4px solid #8fbc8f; /* 柔和草綠色 */
-}
-
-.tier-card.dewdrop {
-    border-top: 4px solid #87ceeb; /* 清透水藍色 */
-}
-
+/* 頂部專屬飾條：從你的花圈設計中提取莫蘭迪色調 */
+.tier-card.seedling { border-top: 5px solid #aebc9c; } /* 莫蘭迪草綠 */
+.tier-card.dewdrop { border-top: 5px solid #d4a5a5; }  /* 乾燥玫瑰粉 */
 .tier-card.lavender-vip {
-    border-top: 4px solid var(--accent-gold); /* 尊爵香檳金 */
-    /* VIP 卡片擁有專屬的微金光背景 */
-    background: linear-gradient(145deg, rgba(212, 175, 55, 0.08), rgba(255,255,255,0.02));
+    border-top: 5px solid var(--accent-gold); /* 尊爵香檳金 */
+    background: linear-gradient(145deg, rgba(212, 175, 55, 0.1), rgba(255,255,255,0.02));
 }
 
+/* 核心優化：讓圖片變成優雅的圓形徽章 */
+.tier-image {
+    width: 85%; /* 稍微縮小，增加留白呼吸感 */
+    aspect-ratio: 1 / 1; /* 強制保持正方形比例 */
+    border-radius: 50%; /* 裁切成完美正圓形 */
+    margin: 0 auto 2rem auto;
+    object-fit: cover;
+    background-color: #fff; /* 確保圓形邊緣純淨 */
+    display: block;
+    /* 加上多層次陰影，營造徽章浮雕感 */
+    box-shadow: 
+        0 0 0 6px rgba(255, 255, 255, 0.08), 
+        0 10px 25px rgba(0, 0, 0, 0.3); 
+    transition: transform 0.5s ease;
+}
+
+/* 當滑鼠移至卡片時，花圈會微微放大與旋轉 */
+.tier-card:hover .tier-image {
+    transform: scale(1.05) rotate(3deg);
+}
+
+/* 保留文字 Icon 設定 (若未來不用圖片時可替換) */
 .tier-icon {
     font-size: 3rem;
     margin-bottom: 1rem;
     filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2));
 }
 
+/* 會員文字與權益排版 */
 .tier-card h4 {
     margin: 0 0 0.5rem 0;
     font-size: 1.4rem;
@@ -208,58 +247,8 @@ h1, h2, h3 {
     line-height: 1.8;
 }
 
-/* 升級：將條列符號改為香檳金十字星，增加高級感 */
 .tier-benefits li::before {
     content: '✦ ';
     color: var(--accent-gold);
     font-size: 1.1rem;
-}
-
-/* 搜尋結果動態框 */
-.member-result-box {
-    background: linear-gradient(145deg, rgba(176, 158, 187, 0.15), rgba(0,0,0,0.2));
-    border: 1px solid var(--lavender-primary);
-    border-radius: 8px;
-    padding: 2rem 3rem;
-    margin-bottom: 3rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
-    animation: fadeIn 0.4s ease-out;
-}
-
-/* 會員卡片展示區 (維持網格排版) */
-.tier-cards {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 2rem;
-    align-items: start;
-    justify-items: center;
-}
-
-/* 圖片版會員卡片專屬樣式 */
-.tier-image-card {
-    width: 100%;
-    max-width: 350px; /* 控制圖片最大寬度，避免過度放大 */
-    height: auto;
-    border-radius: 12px; /* 讓圖片邊角有微微的圓潤感 */
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    cursor: pointer;
-}
-
-/* 滑鼠移過去時的細緻浮雕與發光感 */
-.tier-image-card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 12px 40px rgba(176, 158, 187, 0.4);
-}
-/* 會員卡片內的圖片樣式 */
-.tier-image {
-    width: 100%;
-    height: auto;
-    border-radius: 8px; /* 柔和的邊角 */
-    margin-bottom: 1.5rem; /* 與下方文字拉開呼吸空間 */
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); /* 讓圖片本身帶有微立體感 */
-    object-fit: cover; /* 確保圖片比例不變形 */
 }
