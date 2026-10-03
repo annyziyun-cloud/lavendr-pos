@@ -306,13 +306,11 @@ function deleteAccount() {
 }
 
 /* =======================================================
-   6. 分頁二：專屬調香 - 預約矩陣系統
+   6. 分頁二：專屬調香 - 預約矩陣系統 (日期選擇與自訂彈窗)
    ======================================================= */
-// 定義 6 個預約時段
 const TIME_SLOTS = ["10:00-11:00", "11:30-12:30", "14:00-15:00", "15:30-16:30", "17:00-18:00", "18:30-19:30"];
-// 每日模擬日期 (實務上會動態抓取今天開始的一週)
-const DEMO_DATES = ['2026-10-10', '2026-10-11', '2026-10-12'];
-let currentSelectedDate = '2026-10-10';
+let currentSelectedDate = '';
+let pendingBookingSlot = null; // 記錄正在準備新增預約的時段
 
 // 預約排程資料庫 (關聯到客人的電話)
 let scheduleDatabase = {
@@ -321,32 +319,29 @@ let scheduleDatabase = {
     }
 };
 
-// 初始化分頁二的畫面 (可以在網頁載入或點擊分頁時呼叫)
 function initBookingDashboard() {
-    renderDateSelector();
+    const dateInput = document.getElementById('bookingDate');
+    
+    // 將預設日期設為今天
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+    const formattedToday = `${yyyy}-${mm}-${dd}`;
+    
+    dateInput.value = formattedToday;
+    currentSelectedDate = formattedToday;
+
+    // 監聽日期改變事件 (當店員選擇新日期時觸發)
+    dateInput.addEventListener('change', (e) => {
+        currentSelectedDate = e.target.value;
+        renderDailySchedule(currentSelectedDate);
+    });
+
     renderDailySchedule(currentSelectedDate);
 }
-// 為了確保一載入就準備好，將其綁在 window.onload
 window.addEventListener('DOMContentLoaded', initBookingDashboard);
 
-// 渲染頂部日期按鈕
-function renderDateSelector() {
-    const container = document.getElementById('dateSelector');
-    container.innerHTML = '';
-    DEMO_DATES.forEach(date => {
-        const btn = document.createElement('button');
-        btn.className = `date-btn ${date === currentSelectedDate ? 'active' : ''}`;
-        btn.textContent = date;
-        btn.onclick = () => {
-            currentSelectedDate = date;
-            renderDateSelector(); // 更新 active 狀態
-            renderDailySchedule(date);
-        };
-        container.appendChild(btn);
-    });
-}
-
-// 渲染選定日期的 6 個時段方塊
 function renderDailySchedule(date) {
     const container = document.getElementById('dailySchedule');
     container.innerHTML = '';
@@ -366,11 +361,9 @@ function renderDailySchedule(date) {
                 <div class="booked-list">
         `;
 
-        // 渲染已預約的客人名單
         bookedPhones.forEach(phone => {
             const member = memberDatabase[phone];
             if (member) {
-                // 點擊已預約客人，開啟該客人的「調香工作台」
                 slotHtml += `
                     <div class="booked-customer" onclick="openWorkbench('${phone}', '${date}', '${slot}')">
                         <span>👤 ${member.name}</span>
@@ -380,7 +373,6 @@ function renderDailySchedule(date) {
             }
         });
 
-        // 若人數未滿 2 人，顯示新增預約按鈕
         if (currentCount < maxCapacity) {
             slotHtml += `
                 <button class="empty-slot-btn" onclick="addBooking('${date}', '${slot}')">
@@ -394,43 +386,58 @@ function renderDailySchedule(date) {
     });
 }
 
-// 新增預約邏輯
+// 開啟自訂的預約輸入彈窗
 function addBooking(date, slot) {
-    const phoneInput = prompt(`請輸入欲預約 【${date} ${slot}】 的顧客電話：\n(如需攜伴製作兩瓶，請使用同行者的電話分開預約此時段)`);
-    
-    if (!phoneInput) return; // 按取消
+    pendingBookingSlot = { date, slot };
+    document.getElementById('bookingModalText').textContent = `請輸入欲預約 【${date} ${slot}】 的顧客電話：`;
+    document.getElementById('bookingModalPhone').value = '';
+    document.getElementById('bookingModal').style.display = 'flex'; // 顯示彈窗
+}
 
-    // 檢查是否為會員
+// 關閉預約彈窗
+function closeBookingModal() {
+    document.getElementById('bookingModal').style.display = 'none';
+    pendingBookingSlot = null;
+}
+
+// 確認送出預約
+function confirmBooking() {
+    if (!pendingBookingSlot) return;
+    const { date, slot } = pendingBookingSlot;
+    const phoneInput = document.getElementById('bookingModalPhone').value.trim();
+
+    if (!phoneInput) {
+        alert('請輸入顧客電話！');
+        return;
+    }
+
     if (!memberDatabase[phoneInput]) {
         alert('查無此會員！請先至「1. 會員接待」建立新客檔案。');
-        // 自動切換到分頁一並帶入號碼
+        closeBookingModal();
         switchTab('tab-member');
         document.getElementById('phoneSearch').value = phoneInput;
         searchMember();
         return;
     }
 
-    // 確保排程庫結構存在
     if (!scheduleDatabase[date]) scheduleDatabase[date] = {};
     if (!scheduleDatabase[date][slot]) scheduleDatabase[date][slot] = [];
 
-    // 檢查客人是否已經在此時段
     if (scheduleDatabase[date][slot].includes(phoneInput)) {
         alert('此顧客已預約該時段，一個名字僅能製作一瓶。若需攜伴製作，請以同行者電話預約。');
         return;
     }
 
-    // 將客人加入預約矩陣
     scheduleDatabase[date][slot].push(phoneInput);
     
-    // 同步將預約資訊寫入該會員的個人資料庫 (連動分頁一的近期預約顯示)
     memberDatabase[phoneInput].reservations.unshift({
         date: `${date} ${slot}`,
         type: '一對一調香訂製'
     });
 
     alert(`預約成功！已將 ${memberDatabase[phoneInput].name} 排入 ${slot} 時段。`);
-    renderDailySchedule(date); // 重新渲染畫面
+    closeBookingModal();
+    renderDailySchedule(date);
 }
 
 /* =======================================================
