@@ -1,7 +1,9 @@
 /* 引入 Google 字體：優雅的明體 (標題) 與俐落的黑體 (內文) */
 @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600&family=Noto+Sans+TC:wght@300;400&display=swap');
 
-/* 定義 Lavend/r 亮色系專屬色票 */
+/* =========================================
+   0. 全局變數與基礎設定 (Variables & Reset)
+   ========================================= */
 :root {
     --bg-light: #faf9f8;         /* 溫暖的高級米白底色 */
     --text-dark: #333333;        /* 俐落的深灰色文字 */
@@ -13,7 +15,10 @@
     --border-line: rgba(0, 0, 0, 0.08); /* 柔和的淺色邊框 */
 }
 
-/* 基礎排版設定 */
+* {
+    box-sizing: border-box;
+}
+
 body {
     margin: 0;
     font-family: 'Noto Sans TC', sans-serif;
@@ -23,12 +28,7 @@ body {
     min-height: 100vh;
 }
 
-/* 確保所有元素的內邊距不會撐破外框 (解決卡片重疊的關鍵) */
-* {
-    box-sizing: border-box;
-}
-
-h1, h2, h3 {
+h1, h2, h3, h4 {
     font-family: 'Noto Serif TC', serif;
     letter-spacing: 2px;
     font-weight: 400;
@@ -54,7 +54,6 @@ h1, h2, h3 {
     color: var(--lavender-primary);
 }
 
-/* 導覽列按鈕 */
 .nav-buttons button {
     background: transparent;
     color: var(--text-dark);
@@ -69,20 +68,20 @@ h1, h2, h3 {
     transition: all 0.3s ease;
 }
 
-.nav-buttons button:hover {
+.nav-buttons button:hover, .nav-buttons button.active {
     background: var(--lavender-primary);
     color: #fff;
     border-color: var(--lavender-primary);
 }
 
 /* =========================================
-   2. 共用分頁區塊與動畫
+   2. 共用分頁區塊與動畫 (Layout)
    ========================================= */
 .page-section {
     padding: 3rem 4rem;
     max-width: 1200px;
     margin: 0 auto;
-    animation: fadeIn 0.5s ease-out forwards; 
+    animation: fadeIn 0.4s ease-out forwards; 
 }
 
 @keyframes fadeIn {
@@ -105,33 +104,8 @@ h1, h2, h3 {
 }
 
 /* =========================================
-   3. 搜尋與按鈕區塊
+   3. 按鈕與表單共用元件 (Buttons & Forms)
    ========================================= */
-.search-container {
-    display: flex;
-    gap: 15px;
-    margin-bottom: 3rem;
-}
-
-.search-input {
-    flex: 1;
-    max-width: 400px;
-    background: #ffffff;
-    border: 1px solid #dddddd;
-    border-radius: 6px;
-    padding: 0.8rem 1rem;
-    color: var(--text-dark);
-    font-size: 1rem;
-    font-family: 'Noto Sans TC', sans-serif;
-    transition: all 0.3s ease;
-}
-
-.search-input:focus {
-    outline: none;
-    border-color: var(--lavender-primary);
-    box-shadow: 0 0 0 3px rgba(138, 122, 143, 0.1);
-}
-
 .btn-primary {
     background: var(--lavender-primary);
     color: #fff;
@@ -150,108 +124,6 @@ h1, h2, h3 {
     box-shadow: 0 4px 12px rgba(138, 122, 143, 0.3);
 }
 
-/* 搜尋結果動態框 */
-.member-result-box {
-    background: #ffffff;
-    border: 1px solid var(--lavender-primary);
-    border-radius: 8px;
-    padding: 2rem 3rem;
-    margin-bottom: 3rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-    animation: fadeIn 0.4s ease-out;
-}
-
-/* =========================================
-   4. 會員卡片展示區 (純白簡約版)
-   ========================================= */
-.tier-cards {
-    display: grid;
-    /* 調整最小寬度，確保畫面縮小也能完美換行，不會擠壓 */
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 2.5rem;
-    align-items: stretch;
-}
-
-/* 純白卡片外框 */
-.tier-card {
-    background: var(--card-bg);
-    border: 1px solid var(--border-line);
-    border-radius: 12px;
-    padding: 3rem 2rem;
-    text-align: center;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.tier-card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
-}
-
-/* 頂部專屬色飾條 */
-.tier-card.seedling { border-top: 4px solid #aebc9c; }
-.tier-card.dewdrop { border-top: 4px solid #d4a5a5; }
-.tier-card.lavender-vip {
-    border-top: 4px solid var(--accent-gold);
-    /* VIP 卡片擁有極微弱的香檳金背景 */
-    background: linear-gradient(180deg, rgba(212, 175, 55, 0.03) 0%, #ffffff 100%);
-}
-
-/* 卡片內的圓形圖片 */
-.tier-image {
-    width: 75%;
-    aspect-ratio: 1 / 1;
-    border-radius: 50%;
-    margin: 0 auto 2rem auto;
-    object-fit: cover;
-    display: block;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06); 
-    transition: transform 0.4s ease;
-}
-
-.tier-card:hover .tier-image {
-    transform: scale(1.03);
-}
-
-/* 會員文字與權益排版 */
-.tier-card h4 {
-    margin: 0 0 0.5rem 0;
-    font-size: 1.3rem;
-    letter-spacing: 1px;
-    color: var(--text-dark);
-}
-
-.tier-subtitle {
-    color: var(--text-muted);
-    font-size: 0.95rem;
-    margin-bottom: 2rem;
-}
-
-.tier-benefits {
-    list-style: none;
-    padding: 0;
-    text-align: left;
-    font-size: 0.95rem;
-    line-height: 1.8;
-    color: #555555;
-}
-
-.tier-benefits li::before {
-    content: '✦ ';
-    color: var(--lavender-primary);
-    font-size: 1rem;
-    margin-right: 4px;
-}
-
-/* 特殊處理 VIP 列表星號 */
-.tier-card.lavender-vip .tier-benefits li::before {
-    color: var(--accent-gold);
-}
-
-/* --- 新增：次要按鈕樣式 --- */
 .btn-secondary {
     background: transparent;
     color: var(--lavender-primary);
@@ -264,7 +136,7 @@ h1, h2, h3 {
 }
 
 .btn-secondary:hover {
-    background: rgba(138, 122, 143, 0.1);
+    background: rgba(138, 122, 143, 0.08);
 }
 
 .btn-text {
@@ -274,20 +146,52 @@ h1, h2, h3 {
     font-size: 1rem;
     cursor: pointer;
     padding: 0.8rem 1.5rem;
+    transition: color 0.3s ease;
 }
 
 .btn-text:hover { color: #333; }
 
-/* --- 新增：類似 Google Form 的表單樣式 --- */
+.btn-small {
+    background: var(--lavender-primary);
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: all 0.3s;
+}
+
+.btn-small:hover {
+    background: var(--lavender-hover);
+    transform: translateY(-2px);
+}
+
+.btn-danger {
+    background: transparent;
+    color: #d9534f;
+    border: 1px solid #d9534f;
+    border-radius: 6px;
+    padding: 0.8rem 1.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-danger:hover {
+    background: #d9534f;
+    color: white;
+}
+
+/* 類似 Google Form 的卡片表單 */
 .form-card {
     background: #ffffff;
     border-radius: 8px;
     box-shadow: 0 4px 20px rgba(0,0,0,0.06);
     overflow: hidden;
     margin-bottom: 3rem;
-    border-top: 8px solid var(--lavender-primary); /* 表單頂部亮色飾條 */
+    border-top: 8px solid var(--lavender-primary);
     animation: fadeIn 0.4s ease-out;
-    max-width: 700px;
+    max-width: 800px;
 }
 
 .form-header {
@@ -318,15 +222,16 @@ h1, h2, h3 {
 .form-group input, .form-group select {
     padding: 0.8rem;
     border: 1px solid #ddd;
-    border-radius: 4px;
+    border-radius: 6px;
     font-size: 1rem;
     font-family: inherit;
-    transition: border 0.3s;
+    transition: all 0.3s;
 }
 
 .form-group input:focus, .form-group select:focus {
     outline: none;
     border-color: var(--lavender-primary);
+    box-shadow: 0 0 0 3px rgba(138, 122, 143, 0.15);
 }
 
 .form-group input[readonly] {
@@ -342,7 +247,36 @@ h1, h2, h3 {
     margin-top: 2rem;
 }
 
-/* --- 新增：長方形會員資料方塊樣式 --- */
+/* =========================================
+   4. 分頁一：會員接待與資料方塊
+   ========================================= */
+/* 搜尋列 */
+.search-container {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 3rem;
+}
+
+.search-input {
+    flex: 1;
+    max-width: 400px;
+    background: #ffffff;
+    border: 1px solid #dddddd;
+    border-radius: 6px;
+    padding: 0.8rem 1rem;
+    color: var(--text-dark);
+    font-size: 1rem;
+    font-family: inherit;
+    transition: all 0.3s ease;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: var(--lavender-primary);
+    box-shadow: 0 0 0 3px rgba(138, 122, 143, 0.15);
+}
+
+/* 會員詳細資料方塊 */
 .profile-card {
     background: #ffffff;
     border: 1px solid var(--border-line);
@@ -386,23 +320,8 @@ h1, h2, h3 {
     color: var(--text-dark);
 }
 
-.profile-actions {
-    display: flex;
-    gap: 1rem;
-}
+.profile-actions { display: flex; gap: 1rem; }
 
-/* 特殊按鈕：刪除帳號 */
-.btn-danger {
-    background: transparent;
-    color: #d9534f;
-    border: 1px solid #d9534f;
-    border-radius: 6px;
-    padding: 0.8rem 1.5rem;
-    cursor: pointer;
-}
-.btn-danger:hover { background: #d9534f; color: white; }
-
-/* --- 新增：近期預約顯示區 --- */
 .profile-footer {
     margin-top: 2rem;
     padding-top: 1.5rem;
@@ -431,7 +350,7 @@ h1, h2, h3 {
     border: 1px dashed #ddd;
 }
 
-/* --- 新增：待取貨單管理介面 --- */
+/* 待取貨單列表 */
 .order-list {
     list-style: none;
     padding: 0;
@@ -445,10 +364,7 @@ h1, h2, h3 {
     padding: 1.2rem 1rem;
     border-bottom: 1px solid #f0f0f0;
 }
-
-.order-item:last-child {
-    border-bottom: none;
-}
+.order-item:last-child { border-bottom: none; }
 
 .order-info {
     display: flex;
@@ -461,44 +377,89 @@ h1, h2, h3 {
     text-decoration: line-through;
 }
 
-/* 狀態標籤 */
 .badge {
     font-size: 0.8rem;
     padding: 0.3rem 0.6rem;
     border-radius: 4px;
     font-weight: bold;
 }
+.badge-pending { background: #fff3cd; color: #856404; }
+.badge-completed { background: #d4edda; color: #155724; }
 
-.badge-pending {
-    background: #fff3cd;
-    color: #856404;
+/* 品牌等級卡片 (純白圓形徽章版) */
+.tier-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2.5rem;
+    align-items: stretch;
 }
 
-.badge-completed {
-    background: #d4edda;
-    color: #155724;
+.tier-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-line);
+    border-radius: 12px;
+    padding: 3rem 2rem;
+    text-align: center;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.btn-small {
-    background: var(--lavender-primary);
-    color: white;
-    border: none;
-    padding: 0.5rem 1rem;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 0.85rem;
-    transition: all 0.3s;
+.tier-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
 }
 
-.btn-small:hover {
-    background: var(--lavender-hover);
-    transform: translateY(-2px);
+.tier-card.seedling { border-top: 4px solid #aebc9c; }
+.tier-card.dewdrop { border-top: 4px solid #d4a5a5; }
+.tier-card.lavender-vip {
+    border-top: 4px solid var(--accent-gold);
+    background: linear-gradient(180deg, rgba(212, 175, 55, 0.03) 0%, #ffffff 100%);
 }
+
+.tier-image {
+    width: 75%;
+    aspect-ratio: 1 / 1;
+    border-radius: 50%;
+    margin: 0 auto 2rem auto;
+    object-fit: cover;
+    display: block;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06); 
+    transition: transform 0.4s ease;
+}
+.tier-card:hover .tier-image { transform: scale(1.03); }
+
+.tier-card h4 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.3rem;
+    color: var(--text-dark);
+}
+.tier-subtitle {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    margin-bottom: 2rem;
+}
+.tier-benefits {
+    list-style: none;
+    padding: 0;
+    text-align: left;
+    font-size: 0.95rem;
+    line-height: 1.8;
+    color: #555555;
+}
+.tier-benefits li::before {
+    content: '✦ ';
+    color: var(--lavender-primary);
+    font-size: 1rem;
+    margin-right: 4px;
+}
+.tier-card.lavender-vip .tier-benefits li::before {
+    color: var(--accent-gold);
+}
+
 
 /* =========================================
    5. 分頁二：預約排程矩陣與工作台
    ========================================= */
-/* 日期選擇器 */
 .date-selector {
     display: flex;
     gap: 15px;
@@ -526,7 +487,6 @@ h1, h2, h3 {
     box-shadow: 0 4px 12px rgba(138, 122, 143, 0.3);
 }
 
-/* 時段網格 */
 .daily-schedule {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -565,7 +525,6 @@ h1, h2, h3 {
     border-radius: 20px;
 }
 
-/* 預約名單 */
 .booked-list {
     display: flex;
     flex-direction: column;
@@ -606,7 +565,6 @@ h1, h2, h3 {
     color: var(--lavender-primary);
 }
 
-/* 工作台內部步驟間距 */
 .workbench-step {
     margin-bottom: 2rem;
     padding-bottom: 2rem;
