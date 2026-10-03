@@ -460,24 +460,49 @@ h1, h2, h3, h4 {
 /* =========================================
    5. 分頁二：預約排程矩陣與工作台
    ========================================= */
-.date-selector {
-    display: flex;
-    gap: 15px;
-    margin-bottom: 2rem;
-    overflow-x: auto;
-    padding-bottom: 10px;
+/* --- 日期選擇器樣式 --- */
+.date-picker-input {
+    padding: 0.8rem 1rem;
+    border: 1px solid var(--border-line);
+    border-radius: 6px;
+    font-size: 1rem;
+    font-family: inherit;
+    color: var(--text-dark);
+    background: #ffffff;
+    cursor: pointer;
+    transition: all 0.3s ease;
 }
 
-.date-btn {
+.date-picker-input:focus {
+    outline: none;
+    border-color: var(--lavender-primary);
+    box-shadow: 0 0 0 3px rgba(138, 122, 143, 0.15);
+}
+
+/* --- 專屬預約彈窗樣式 (淺白色方框) --- */
+.custom-modal-overlay {
+    position: fixed;
+    top: 0; 
+    left: 0; 
+    width: 100%; 
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(5px); /* 讓背景呈現質感模糊 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000; /* 確保浮在最上層 */
+    animation: fadeIn 0.3s ease-out;
+}
+
+.custom-modal-box {
     background: #ffffff;
-    border: 1px solid var(--border-line);
-    border-radius: 8px;
-    padding: 0.8rem 1.5rem;
-    cursor: pointer;
-    font-size: 1rem;
-    min-width: 120px;
-    text-align: center;
-    transition: all 0.3s ease;
+    padding: 2.5rem;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 450px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+    border-top: 6px solid var(--lavender-primary);
 }
 
 .date-btn.active {
