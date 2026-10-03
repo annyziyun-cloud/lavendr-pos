@@ -22,8 +22,61 @@
         
         <!-- 分頁一：會員接待 -->
         <section id="tab-member" class="page-section active">
-            <h2>預約與會員櫃檯</h2>
-            <p>這裡將會放置電話預約登記與三階會員（微風草本、晨露花香、薰衣草花田）的查詢介面。</p>
+            <h2 class="section-title">Reception & Membership</h2>
+            
+            <!-- 顧客搜尋區塊 -->
+            <div class="search-container">
+                <input type="text" id="phoneSearch" placeholder="請輸入顧客電話 (例: 0900000000)" class="search-input">
+                <button class="btn-primary" onclick="searchMember()">查詢會員</button>
+            </div>
+
+            <!-- 搜尋結果顯示區 (預設隱藏) -->
+            <div id="memberResult" class="member-result-box" style="display: none;">
+                <!-- 這裡的內容會由 JavaScript 動態生成 -->
+            </div>
+
+            <!-- 品牌會員制度展示 (預設顯示) -->
+            <div class="tier-info-container" id="tierInfo">
+                <h3 class="subsection-title">Lavend/r 香氛會員等級</h3>
+                <div class="tier-cards">
+                    
+                    <!-- 初階會員 -->
+                    <div class="tier-card seedling">
+                        <div class="tier-icon">🌱</div>
+                        <h4>微風草本 Seedling</h4>
+                        <p class="tier-subtitle">初階會員</p>
+                        <ul class="tier-benefits">
+                            <li>基礎點數累積</li>
+                        </ul>
+                    </div>
+
+                    <!-- 中階會員 -->
+                    <div class="tier-card dewdrop">
+                        <div class="tier-icon">💧</div>
+                        <h4>晨露花香 Dewdrop</h4>
+                        <p class="tier-subtitle">中階會員</p>
+                        <ul class="tier-benefits">
+                            <li>生日專屬禮金</li>
+                            <li>指定系列 8 折優惠</li>
+                        </ul>
+                    </div>
+
+                    <!-- 高階會員 -->
+                    <div class="tier-card lavender-vip">
+                        <div class="tier-icon">💜</div>
+                        <h4>薰衣草花田 Lavender</h4>
+                        <p class="tier-subtitle">VIP 高階會員</p>
+                        <ul class="tier-benefits">
+                            <li>升級專屬禮盒包裝免費</li>
+                            <li>消費點數雙倍送</li>
+                            <li>生日專屬禮金</li>
+                            <li>指定系列 8 折優惠</li>
+                            <li>每年一次免費一對一調香</li>
+                        </ul>
+                    </div>
+
+                </div>
+            </div>
         </section>
 
         <!-- 分頁二：情境問卷與專屬調香 -->
