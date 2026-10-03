@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lavend/r 香氛選物所 - 店員工作台</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- 頂部導覽列 -->
+    <nav class="top-nav">
+        <h1>Lavend/r POS</h1>
+        <div class="nav-buttons">
+            <button onclick="switchTab('tab-member')">1. 會員接待</button>
+            <button onclick="switchTab('tab-quiz')">2. 專屬調香</button>
+            <button onclick="switchTab('tab-pos')">3. 結帳工作台</button>
+        </div>
+    </nav>
+
+    <!-- 主內容區 -->
+    <main id="app-container">
+        
+        <!-- 分頁一：會員接待 -->
+        <section id="tab-member" class="page-section active">
+            <h2>預約與會員櫃檯</h2>
+            <p>這裡將會放置電話預約登記與三階會員（微風草本、晨露花香、薰衣草花田）的查詢介面。</p>
+        </section>
+
+        <!-- 分頁二：情境問卷與專屬調香 -->
+        <section id="tab-quiz" class="page-section" style="display: none;">
+            <h2>香水處方箋與客製化定裝</h2>
+            <p>這裡將會放置情境 Likert Scale 量表，以及瓶身刻字、手寫卡片的即時預覽區。</p>
+        </section>
+
+        <!-- 分頁三：POS 選物與結帳 -->
+        <section id="tab-pos" class="page-section" style="display: none;">
+            <h2>智慧購物車與雙軌取貨單</h2>
+            <p>這裡將會結合指定系列商品點選，並自動計算滿 2000 折 200 及滿件贈禮邏輯。</p>
+        </section>
+
+    </main>
+
+    <script src="js/app.js"></script>
+</body>
+</html>
