@@ -437,8 +437,11 @@ const TIME_SLOTS = ["10:00-11:00", "11:30-12:30", "14:00-15:00", "15:30-16:30", 
 let currentSelectedDate = '';
 let pendingBookingSlot = null; 
 
+// ★ 升級資料庫：現在能記錄顧客的預約狀態 (已預約 / 已完成)
 let scheduleDatabase = {
-    '2026-10-10': { '14:00-15:00': ['0900000000'] }
+    '2026-10-10': { 
+        '14:00-15:00': [{ phone: '0900000000', status: '已預約' }] 
+    }
 };
 
 function initBookingDashboard() {
@@ -464,15 +467,31 @@ function renderDailySchedule(date) {
     const dayData = scheduleDatabase[date] || {};
 
     TIME_SLOTS.forEach(slot => {
-        const bookedPhones = dayData[slot] || [];
-        const currentCount = bookedPhones.length;
+        const bookedList = dayData[slot] || [];
+        const currentCount = bookedList.length; // 已取消的會被移出陣列，空出名額
         
         let slotHtml = `<div class="time-slot-card"><div class="slot-header"><span class="slot-time">${slot}</span><span class="slot-capacity">${currentCount} / 2 人</span></div><div class="booked-list">`;
 
-        bookedPhones.forEach(phone => {
-            const member = memberDatabase[phone];
+        bookedList.forEach((booking, index) => {
+            const member = memberDatabase[booking.phone];
             if (member) {
-                slotHtml += `<div class="booked-customer" onclick="openWorkbench('${phone}', '${date}', '${slot}')"><span>👤 ${member.name}</span><span style="color:#888; font-size:0.85rem;">${phone}</span></div>`;
+                // 依照狀態改變文字顏色
+                const statusColor = booking.status === '已完成' ? '#aebc9c' : '#888';
+                
+                slotHtml += `
+                    <div class="booked-customer" onclick="openWorkbench('${booking.phone}', '${date}', '${slot}')">
+                        <div>
+                            <span>👤 ${member.name}</span>
+                            <span style="color:#888; font-size:0.85rem; margin-left: 5px;">${booking.phone}</span>
+                        </div>
+                        <!-- ★ 新增：狀態切換選單 (防冒泡避免點擊時開啟工作台) -->
+                        <select class="cart-item-status-select" style="margin: 0; color: ${statusColor}; border-color: ${statusColor};" 
+                            onchange="changeBookingStatus('${date}', '${slot}', ${index}, this.value)" onclick="event.stopPropagation()">
+                            <option value="已預約" ${booking.status === '已預約' ? 'selected' : ''}>已預約</option>
+                            <option value="已完成" ${booking.status === '已完成' ? 'selected' : ''}>已完成</option>
+                            <option value="已取消">❌ 取消預約</option>
+                        </select>
+                    </div>`;
             }
         });
 
@@ -482,6 +501,35 @@ function renderDailySchedule(date) {
         slotHtml += `</div></div>`;
         container.innerHTML += slotHtml;
     });
+}
+
+// ★ 新增：切換/取消預約狀態邏輯
+function changeBookingStatus(date, slot, index, newStatus) {
+    const booking = scheduleDatabase[date][slot][index];
+    const phone = booking.phone;
+    
+    if (newStatus === '已取消') {
+        if(confirm('確定要取消此預約嗎？取消後將釋放該時段名額。')) {
+            scheduleDatabase[date][slot].splice(index, 1); // 移除預約，釋放名額
+            // 同步更新會員資料庫
+            const member = memberDatabase[phone];
+            if(member) {
+                const resIndex = member.reservations.findIndex(r => r.date === `${date} ${slot}`);
+                if(resIndex > -1) member.reservations[resIndex].type = '一對一調香 (已取消)';
+            }
+        }
+    } else {
+        // 切換為「已完成」或恢復「已預約」
+        scheduleDatabase[date][slot][index].status = newStatus;
+        const member = memberDatabase[phone];
+        if(member && newStatus === '已完成') {
+            const resIndex = member.reservations.findIndex(r => r.date === `${date} ${slot}`);
+            if(resIndex > -1 && !member.reservations[resIndex].type.includes('已完成')) {
+                member.reservations[resIndex].type = '一對一調香 (已完成)';
+            }
+        }
+    }
+    renderDailySchedule(date); // 重新渲染畫面
 }
 
 function addBooking(date, slot) {
@@ -513,11 +561,13 @@ function confirmBooking() {
 
     if (!scheduleDatabase[date]) scheduleDatabase[date] = {};
     if (!scheduleDatabase[date][slot]) scheduleDatabase[date][slot] = [];
-    if (scheduleDatabase[date][slot].includes(phoneInput)) {
+    
+    // ★ 更新驗證陣列結構的寫法
+    if (scheduleDatabase[date][slot].some(b => b.phone === phoneInput)) {
         alert('此顧客已預約該時段，一個名字僅能製作一瓶。'); return;
     }
 
-    scheduleDatabase[date][slot].push(phoneInput);
+    scheduleDatabase[date][slot].push({ phone: phoneInput, status: '已預約' });
     memberDatabase[phoneInput].reservations.unshift({ date: `${date} ${slot}`, type: '一對一調香訂製' });
 
     alert(`預約成功！`);
