@@ -267,35 +267,84 @@
                         <div class="summary-line total-line"><span>總計：</span><span id="cartTotal">$0</span></div>
                     </div>
 
-                    <!-- ★ 新增：結帳設定區塊 (載具、付款、取貨狀態) -->
+                    <!-- 進階結帳設定區塊 -->
                     <div class="checkout-settings" style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 2px solid #eee;">
                         <div class="form-group" style="margin-bottom: 1rem;">
                             <label>🧾 載具條碼 (選填)</label>
                             <input type="text" id="cartCarrier" placeholder="例: /AB12345" style="border-color: #ddd;">
                         </div>
-                        <div style="display: flex; gap: 10px;">
-                            <div class="form-group" style="flex: 1; margin-bottom: 0;">
-                                <label>💳 付款方式</label>
-                                <select id="cartPayment">
-                                    <option value="信用卡">信用卡</option>
-                                    <option value="現金">現金</option>
-                                    <option value="行動支付">行動支付</option>
-                                </select>
+                        
+                        <div class="form-group" style="margin-bottom: 10px;">
+                            <label>💳 付款方式</label>
+                            <select id="cartPayment" onchange="togglePaymentFields()">
+                                <option value="現金">現金</option>
+                                <option value="信用卡">信用卡</option>
+                                <option value="行動支付">行動支付</option>
+                            </select>
+                        </div>
+                        
+                        <!-- 動態付款輸入區 -->
+                        <div id="paymentDetails" style="background: #f9f9f9; padding: 1rem; border-radius: 6px; border: 1px dashed #ccc; margin-bottom: 1rem;">
+                            <!-- 現金區 -->
+                            <div id="payCash">
+                                <label style="font-size:0.85rem; color:#555; font-weight:bold;">實收金額 (NT$)</label>
+                                <input type="number" id="cashReceived" placeholder="輸入顧客給付金額" style="width:100%; padding:0.6rem; margin-top:5px; border:1px solid #ddd; border-radius:4px;" oninput="calculateChange()">
+                                <div id="changeAmountDisplay" style="margin-top: 8px; font-weight: bold; color: var(--text-muted); font-size: 0.95rem;">找零：$0</div>
                             </div>
-                            <div class="form-group" style="flex: 1; margin-bottom: 0;">
-                                <label>📦 購入產品狀態</label>
-                                <!-- value 對應會員資料庫的 status -->
-                                <select id="cartOrderStatus">
-                                    <option value="已領取">有現貨 (直接帶走)</option>
-                                    <option value="待取貨">需訂貨 (加入待取貨單)</option>
-                                </select>
+                            <!-- 信用卡區 (預設隱藏) -->
+                            <div id="payCredit" style="display:none;">
+                                <label style="font-size:0.85rem; color:#555; font-weight:bold;">請輸入信用卡卡號</label>
+                                <input type="text" id="creditCardNum" placeholder="**** **** **** ****" style="width:100%; padding:0.6rem; margin-top:5px; border:1px solid #ddd; border-radius:4px;">
+                            </div>
+                            <!-- 行動支付區 (預設隱藏) -->
+                            <div id="payMobile" style="display:none;">
+                                <label style="font-size:0.85rem; color:#555; font-weight:bold;">結帳成功序號</label>
+                                <input type="text" id="mobileTransactionId" placeholder="輸入 LINE Pay / 街口 交易序號" style="width:100%; padding:0.6rem; margin-top:5px; border:1px solid #ddd; border-radius:4px;">
                             </div>
                         </div>
                     </div>
                     
-                    <button class="btn-primary" style="width: 100%; margin-top: 20px; font-size: 1.1rem; padding: 1rem;" onclick="processCheckout()">確認結帳</button>
+                    <button class="btn-primary" style="width: 100%; font-size: 1.1rem; padding: 1rem;" onclick="processCheckout()">確認結帳</button>
                 </div>
             </div>
+        </section>
+
+        <!-- ★ 數位收據彈窗 (預設隱藏) -->
+        <div id="receiptModal" class="custom-modal-overlay" style="display: none; z-index: 2000;">
+            <div class="receipt-box">
+                <div class="receipt-zigzag"></div>
+                
+                <!-- 收據表頭 -->
+                <div style="text-align: center; border-bottom: 1px dashed #888; padding-bottom: 15px; margin-bottom: 15px;">
+                    <h2 style="font-family: 'Noto Serif TC', serif; font-size: 1.5rem; margin: 0; color: #333; letter-spacing: 2px;">Lavend/r</h2>
+                    <h3 style="font-size: 1rem; margin: 5px 0 0 0; color: #555; font-family: 'Noto Sans TC', sans-serif;">香氛選物所</h3>
+                    <p id="receiptDate" style="font-size: 0.85rem; color: #888; margin: 5px 0 0 0;">YYYY/MM/DD HH:MM</p>
+                </div>
+                
+                <!-- 購買清單 -->
+                <div id="receiptItems" style="font-size: 0.9rem; color: #333; margin-bottom: 15px; min-height: 80px;">
+                    <!-- JS 動態印出商品與狀態 -->
+                </div>
+                
+                <!-- 金額結算 -->
+                <div style="border-top: 1px dashed #888; padding-top: 15px; font-size: 0.9rem; color: #333;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px;"><span>小計</span><span id="rcptSub">$0</span></div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px; color: #d9534f;"><span>優惠折抵</span><span id="rcptDisc">-$0</span></div>
+                    <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 1.2rem; margin-top: 10px;"><span>總計</span><span id="rcptTotal">$0</span></div>
+                </div>
+                
+                <!-- 結帳明細 -->
+                <div style="border-top: 1px dashed #888; margin-top: 15px; padding-top: 15px; font-size: 0.85rem; color: #555;">
+                    <p style="margin: 3px 0;">付款方式：<span id="rcptPayMethod"></span></p>
+                    <p style="margin: 3px 0;" id="rcptPayDetail"></p>
+                    <p style="margin: 3px 0;" id="rcptCarrier"></p>
+                </div>
+                
+                <div style="text-align: center; margin-top: 25px;">
+                    <button class="btn-primary" style="width: 100%; font-family: 'Noto Sans TC', sans-serif;" onclick="closeReceipt()">完成並列印</button>
+                </div>
+            </div>
+        </div>
         </section>
 
     </main>
