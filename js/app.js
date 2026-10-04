@@ -612,10 +612,11 @@ function getOptionLabel(questionId, value) {
 // 商品目錄庫 (包含特定優惠系列)
 const productCatalog = [
     { id: 'P01', name: '客製化調香香水 (50ml)', series: '調香訂製', price: 3280 },
-    { id: 'P02', name: '薰衣草保濕潔手露', series: '薰衣草淨化系列', price: 850 },
-    { id: 'P03', name: '薰衣草舒緩沐浴油', series: '薰衣草淨化系列', price: 1250 },
-    { id: 'P04', name: '晨露花香香氛蠟燭', series: '晨露花香系列', price: 1580 },
-    { id: 'P05', name: '大理石擴香石', series: '居家空間系列', price: 980 }
+    { id: 'P02', name: '保濕潔手露', series: '淨化系列', price: 850 },
+    { id: 'P03', name: '舒緩沐浴油', series: '淨化系列', price: 1250 },
+    { id: 'P04', name: '香氛蠟燭', series: '居家空間系列', price: 1580 },
+    { id: 'P05', name: '大理石擴香石', series: '居家空間系列', price: 680 },
+    { id: 'P06', name: '護髮精油', series: '養護精油系列', price: 1280 }
 ];
 
 let shoppingCart = [];
@@ -674,11 +675,11 @@ function updateCartUI() {
     const cartItemsDiv = document.getElementById('cartItems');
     cartItemsDiv.innerHTML = '';
     let subtotal = 0;
-    let targetSeriesTotal = 0; // 用來計算「薰衣草淨化系列」的總額
+    let targetSeriesTotal = 0; // 用來計算「淨化系列」的總額
 
     shoppingCart.forEach((item, index) => {
         subtotal += item.price;
-        if(item.series === '薰衣草淨化系列') {
+        if(item.series === '淨化系列') {
             targetSeriesTotal += item.price;
         }
 
@@ -715,7 +716,7 @@ function processCheckout() {
     let targetSeriesTotal = 0;
     shoppingCart.forEach(item => {
         subtotal += item.price;
-        if(item.series === '薰衣草淨化系列') targetSeriesTotal += item.price;
+        if(item.series === '淨化系列') targetSeriesTotal += item.price;
     });
 
     const member = memberDatabase[currentViewedMemberPhone];
@@ -743,7 +744,7 @@ function processCheckout() {
             });
         });
 
-        alert(`✅ 結帳成功！總金額：$${total.toLocaleString()}。\n${discount > 0 ? '(已自動折抵薰衣草系列滿額 $200)\n' : ''}已為 ${member.name} 累積 ${earnedPoints} 點。`);
+        alert(`✅ 結帳成功！總金額：$${total.toLocaleString()}。\n${discount > 0 ? '(已自動折抵淨化系列滿額 $200)\n' : ''}已為 ${member.name} 累積 ${earnedPoints} 點。`);
     } else {
         alert(`✅ 非會員結帳成功！總金額：$${total.toLocaleString()}。`);
     }
