@@ -652,3 +652,93 @@ h1, h2, h3, h4 {
     display: flex;
     justify-content: flex-end;
 }
+
+/* =========================================
+   6. 分頁三：結帳工作台 (POS Checkout)
+   ========================================= */
+.pos-layout {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 2rem;
+    align-items: start;
+}
+
+/* 左側商品網格 */
+.product-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 1.5rem;
+}
+
+.product-card {
+    background: #fff;
+    border: 1px solid var(--border-line);
+    border-radius: 8px;
+    padding: 1.5rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+}
+
+.product-card:hover {
+    border-color: var(--lavender-primary);
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(138, 122, 143, 0.15);
+}
+
+.product-series { font-size: 0.8rem; color: var(--lavender-primary); margin-bottom: 5px; font-weight: bold; }
+.product-name { font-size: 1.1rem; font-weight: bold; margin-bottom: 10px; color: var(--text-dark); }
+.product-price { font-size: 1rem; color: #555; }
+
+/* 右側購物車 */
+.pos-cart-section {
+    background: #fff;
+    border: 1px solid var(--border-line);
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.04);
+    position: sticky;
+    top: 2rem;
+}
+
+.cart-customer-info {
+    background: #faf9f8;
+    padding: 1rem;
+    border-radius: 6px;
+    margin-bottom: 1.5rem;
+    font-size: 0.95rem;
+    border-left: 4px solid var(--lavender-primary);
+}
+
+.cart-items {
+    min-height: 150px;
+    max-height: 350px;
+    overflow-y: auto;
+    margin-bottom: 1.5rem;
+}
+
+.cart-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px dashed #eee;
+    padding: 12px 0;
+}
+
+.cart-item-name { flex: 1; font-size: 0.95rem; color: var(--text-dark); }
+.cart-item-price { font-weight: bold; margin: 0 15px; color: #555; }
+.btn-remove {
+    background: #ffeeee; color: #d9534f; border: none; 
+    padding: 4px 8px; border-radius: 4px; cursor: pointer;
+    font-size: 0.8rem; transition: background 0.2s;
+}
+.btn-remove:hover { background: #fcc; }
+
+.cart-summary { border-top: 2px solid #eee; padding-top: 1.5rem; }
+.summary-line { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 1rem; }
+.discount-line { color: #d9534f; font-weight: bold; }
+.total-line { 
+    font-size: 1.4rem; font-weight: bold; color: var(--lavender-primary); 
+    margin-top: 15px; padding-top: 15px; border-top: 1px dashed #ccc; 
+}
