@@ -266,8 +266,34 @@
                         <div class="summary-line discount-line"><span>特定系列滿千折百：</span><span id="cartDiscount">-$0</span></div>
                         <div class="summary-line total-line"><span>總計：</span><span id="cartTotal">$0</span></div>
                     </div>
+
+                    <!-- ★ 新增：結帳設定區塊 (載具、付款、取貨狀態) -->
+                    <div class="checkout-settings" style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 2px solid #eee;">
+                        <div class="form-group" style="margin-bottom: 1rem;">
+                            <label>🧾 載具條碼 (選填)</label>
+                            <input type="text" id="cartCarrier" placeholder="例: /AB12345" style="border-color: #ddd;">
+                        </div>
+                        <div style="display: flex; gap: 10px;">
+                            <div class="form-group" style="flex: 1; margin-bottom: 0;">
+                                <label>💳 付款方式</label>
+                                <select id="cartPayment">
+                                    <option value="信用卡">信用卡</option>
+                                    <option value="現金">現金</option>
+                                    <option value="行動支付">行動支付</option>
+                                </select>
+                            </div>
+                            <div class="form-group" style="flex: 1; margin-bottom: 0;">
+                                <label>📦 購入產品狀態</label>
+                                <!-- value 對應會員資料庫的 status -->
+                                <select id="cartOrderStatus">
+                                    <option value="已領取">有現貨 (直接帶走)</option>
+                                    <option value="待取貨">需訂貨 (加入待取貨單)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
                     
-                    <button class="btn-primary" style="width: 100%; margin-top: 20px;" onclick="processCheckout()">確認結帳</button>
+                    <button class="btn-primary" style="width: 100%; margin-top: 20px; font-size: 1.1rem; padding: 1rem;" onclick="processCheckout()">確認結帳</button>
                 </div>
             </div>
         </section>
