@@ -717,11 +717,15 @@ function getOptionLabel(questionId, value) {
    ======================================================= */
 const productCatalog = [
     { id: 'P01', name: '客製化調香香水 (50ml)', series: '調香訂製', price: 3280 },
-    { id: 'P02', name: '保濕潔手露', series: '淨化系列', price: 850 },
-    { id: 'P03', name: '舒緩沐浴油', series: '淨化系列', price: 1250 },
+    { id: 'P02', name: '保濕潔手露', series: '淨化系列', price: 800 },
+    { id: 'P03', name: '舒緩沐浴油', series: '淨化系列', price: 1200 },
     { id: 'P04', name: '香氛蠟燭', series: '居家空間系列', price: 1580 },
     { id: 'P05', name: '大理石擴香石', series: '居家空間系列', price: 680 },
-    { id: 'P06', name: '香氛護髮精油', series: '養護精油系列', price: 800 }
+    { id: 'P06', name: '香氛護髮精油', series: '香氛養護系列', price: 800 },
+    { id: 'P07', name: '身體潤膚乳', series: '香氛養護系列', price: 600 },
+    { id: 'P08', name: '凝香膏(固態香水)', series: '經典香氛系列', price: 1500 },
+    { id: 'P09', name: '經典香水 (50ml)', series: '經典香氛系列', price: 2200 },
+    { id: 'P10', name: '經典香水 (15ml)', series: '經典香氛系列', price: 800 },
 ];
 
 let shoppingCart = [];
