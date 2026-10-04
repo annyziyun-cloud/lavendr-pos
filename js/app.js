@@ -20,104 +20,88 @@ let memberDatabase = {
     }
 };
 
-let currentViewedMemberPhone = '';
-
 /* =======================================================
-   ★ Lavend/r 調香系統大腦：題目與故事資料庫
+   ★ Lavend/r 調香系統大腦：題目、標籤與故事資料庫
    ======================================================= */
+
+// 1. 核心題庫 (Phase 1 & Phase 2)
 const scentQuizData = {
-    // 共同必答題 (Q1 ~ Q6)
     baseQuestions: [
         {
-            id: 'Q1',
-            question: '推開 Lavend/r 的門，你希望今天帶走的這瓶香水，是為了誰而調製？',
+            id: 'Q1', question: '推開 Lavend/r 的門，你希望今天帶走的這瓶香水，是為了誰而調製？',
             options: [
-                { label: '「給現在的我」', value: 'A' },
-                { label: '「給理想中的我」', value: 'B' },
-                { label: '「給特別的你」', value: 'C' },
-                { label: '「給某個瞬間」', value: 'D' }
+                { label: '「給現在的我」', value: 'A' }, { label: '「給理想中的我」', value: 'B' },
+                { label: '「給特別的你」', value: 'C' }, { label: '「給某個瞬間」', value: 'D' }
             ]
         },
         {
-            id: 'Q2',
-            question: '當這股氣味與肌膚融合時，你希望它散發的是什麼樣感受？',
+            id: 'Q2', question: '當這股氣味與肌膚融合時，你希望它散發的是什麼樣感受？',
             options: [
-                { label: '安靜而保有邊界：不過度熱情，帶點清冷與疏離感，只讓懂得人靠近。', value: 'A' },
-                { label: '充滿張力與生命力：打破沉悶，帶有反差感，讓人無法忽視的存在。', value: 'B' },
-                { label: '溫潤而包容：沒有攻擊性，像一個安全的避風港，能承載所有的情緒。', value: 'C' },
-                { label: '深邃且難以捉摸：充滿未說出口的潛台詞，需要時間慢慢一層層剝開。', value: 'D' }
+                { label: '安靜而保有邊界：不過度熱情，帶點清冷與疏離感...', value: 'A', archetype: 'intellectual_woods' },
+                { label: '充滿張力與生命力：打破沉悶，帶有反差感...', value: 'B', archetype: 'vibrant_awakening' },
+                { label: '溫潤而包容：沒有攻擊性，像一個安全的避風港...', value: 'C', archetype: 'second_skin' },
+                { label: '深邃且難以捉摸：充滿未說出口的潛台詞...', value: 'D', archetype: 'velvet_paradox' }
             ]
         },
         {
-            id: 'Q3',
-            question: '如果這瓶香水是一本小說，你認為哪一句話最適合印在扉頁呢?',
+            id: 'Q3', question: '如果這瓶香水是一本小說，你認為哪一句話最適合印在扉頁呢?',
             options: [
-                { label: '「在極致的克制與秩序中，往往藏著最深沉的熱愛。」', value: 'A' },
-                { label: '「平靜的水面下，是旁人看不見的暗湧。」', value: 'B' },
-                { label: '「那些沒有說出口的，都在空氣裡了。」', value: 'C' },
-                { label: '「故事從最精彩的半途開始，沒有起點，也沒有終點。」', value: 'D' }
+                { label: '「在極致的克制與秩序中，往往藏著最深沉的熱愛。」', value: 'A', archetype: 'intellectual_woods' },
+                { label: '「平靜的水面下，是旁人看不見的暗湧。」', value: 'B', archetype: 'velvet_paradox' },
+                { label: '「那些沒有說出口的，都在空氣裡了。」', value: 'C', archetype: 'grounded_earth' },
+                { label: '「故事從最精彩的半途開始，沒有起點，也沒有終點。」', value: 'D', archetype: 'vibrant_awakening' }
             ]
         },
         {
-            id: 'Q4',
-            question: '閉上眼睛想像，讓香味帶領你前往一個世界，在這世界中，讓你最有感觸的「質地」是什麼呢？',
+            id: 'Q4', question: '閉上眼睛想像，這段故事的「底色與質地」摸起來是什麼感覺？',
             options: [
-                { label: '冰涼的拋光石材，或是雨後乾淨微冷的空氣。', value: 'A', tags: ['醛香', '白麝香'] },
-                { label: '陽光曬過的棉麻布料，帶著體溫的柔軟。', value: 'B', tags: ['香草', '琥珀'] },
-                { label: '帶有顆粒感的粗糙羊皮紙，或是乾燥的木柴。', value: 'C', tags: ['廣藿香', '雪松'] },
-                { label: '揉碎的綠色枝葉，與剛拂過果園的微風。', value: 'D', tags: ['無花果', '柑橘'] }
+                { label: '冰涼的拋光石材，或是雨後乾淨微冷的空氣。', value: 'A', archetype: 'mineral_horizon' },
+                { label: '陽光曬過的棉麻布料，帶著體溫的柔軟。', value: 'B', archetype: 'second_skin' },
+                { label: '帶有顆粒感的粗糙羊皮紙，或是乾燥的木柴。', value: 'C', archetype: 'intellectual_woods' },
+                { label: '揉碎的綠色枝葉，與剛拂過果園的微風。', value: 'D', archetype: 'grounded_earth' }
             ]
         },
         {
-            id: 'Q5',
-            question: '這瓶香水中，你最「不可或缺」的核心靈魂是什麼？',
+            id: 'Q5', question: '這瓶香水中，你最「不可或缺」的核心靈魂是什麼？',
             options: [
-                { label: '茶香與木質的沉穩（伯爵茶、檀香、雪松）', value: 'A', tags: ['木質', '茶香'] },
-                { label: '花朵與果實的靈動（玫瑰、鈴蘭、無花果、柑橘）', value: 'B', tags: ['花香', '果香'] },
-                { label: '辛香與皮革的微醺（粉紅胡椒、莎草、麂皮）', value: 'C', tags: ['辛香', '皮革'] },
-                { label: '乾淨皂香與草本的純粹（薰衣草、薄荷、白麝香）', value: 'D', tags: ['草本', '皂香'] }
+                { label: '茶香與木質的沉穩（伯爵茶、檀香、雪松）', value: 'A', archetype: 'intellectual_woods', note: '伯爵茶、檀香' },
+                { label: '花朵與果實的靈動（玫瑰、鈴蘭、無花果、柑橘）', value: 'B', archetype: 'vibrant_awakening', note: '千葉玫瑰、水蜜桃' },
+                { label: '辛香與皮革的微醺（粉紅胡椒、莎草、麂皮）', value: 'C', archetype: 'velvet_paradox', note: '粉紅胡椒、莎草' },
+                { label: '乾淨皂香與草本的純粹（薰衣草、薄荷、白麝香）', value: 'D', archetype: 'second_skin', note: '薰衣草、白麝香' }
             ]
         },
         {
-            id: 'Q6',
-            question: '最後，為了確保劇本的完美，有什麼氣味元素是你希望「絕對不要出現」的？(可多選)',
-            multiple: true,
+            id: 'Q6', question: '最後，有什麼氣味元素是你希望「絕對不要出現」的？(可多選)', multiple: true,
             options: [
-                { label: '過於甜膩的糖果/香草味', value: 'A' },
-                { label: '濃烈的白花香（如茉莉、晚香玉）', value: 'B' },
-                { label: '帶有侵略性的辛香料味', value: 'C' },
-                { label: '潮濕的泥土或苔蘚味', value: 'D' },
+                { label: '過於甜膩的糖果/香草味', value: 'A' }, { label: '濃烈的白花香（如茉莉、晚香玉）', value: 'B' },
+                { label: '帶有侵略性的辛香料味', value: 'C' }, { label: '潮濕的泥土或苔蘚味', value: 'D' },
                 { label: '毫無禁忌，請給我驚喜', value: 'E', exclusive: true } 
             ]
         }
     ],
-
     // 支線題庫
     branches: {
         'A': [ // 支線 A：內在庇護所
             {
-                id: 'A1',
-                question: '下方的敘述中，你認為哪一個瞬間最能讓你感到絕對的「愜意」與放鬆？',
+                id: 'A1', question: '哪一個瞬間最能讓你感到絕對的「愜意」與放鬆？',
                 options: [
-                    { label: '午後的一場大雨後，空氣充滿濕度，青草與土壤的氣味圍繞。', value: '1' },
-                    { label: '早晨的陽光透過亞麻窗簾，灑落在剛洗淨的純白床單上，帶著微溫的觸感。', value: '2' },
-                    { label: '夜晚點起一盞暖黃閱讀燈，窩在絲絨沙發裡翻閱舊書，手邊是一杯冒著熱氣的茶。', value: '3' },
-                    { label: '獨自漫步在清晨還帶著薄霧的灰藍色海灘，迎面吹來帶有鹽分與冷空氣的微風。', value: '4' }
+                    { label: '午後的一場大雨後，空氣充滿濕度，青草與土壤的氣味。', value: '1', note: '橡木苔、岩蘭草、苦橙葉' },
+                    { label: '早晨陽光透過亞麻窗簾，灑在剛洗淨的純白床單上。', value: '2', note: '鈴蘭、鳶尾花、純淨皂香' },
+                    { label: '夜晚點起暖黃閱讀燈，窩在沙發裡翻閱舊書，喝著茶。', value: '3', note: '伯爵茶、雪松、琥珀' },
+                    { label: '漫步在清晨薄霧的海灘，迎面吹來帶有鹽分的微風。', value: '4', note: '海鹽、鼠尾草、冰涼醛香' }
                 ]
             },
             {
-                id: 'A2',
-                question: '當置身於人群中時，別人在第一時間感受到的你，最接近以下哪一種輪廓？',
+                id: 'A2', question: '當置身於人群中時，別人在第一時間感受到的你，最接近哪一種輪廓？',
                 options: [
-                    { label: '「打磨光滑的冷調大理石」', value: '1' },
-                    { label: '「透著微光的亞麻織物」', value: '2' },
-                    { label: '「帶有解構剪裁的深色層次」', value: '3' },
-                    { label: '「折射著光線的流動稜鏡」', value: '4' }
+                    { label: '「打磨光滑的冷調大理石」', value: '1', note: '柏樹、微苦的冷木質' },
+                    { label: '「透著微光的亞麻織物」', value: '2', note: '羊絨木、洋甘菊' },
+                    { label: '「帶有解構剪裁的深色層次」', value: '3', note: '帶煙燻感的木質、沉香' },
+                    { label: '「折射著光線的流動稜鏡」', value: '4', note: '杜松子、乾淨雪松' }
                 ]
             },
             {
-                id: 'A3',
-                question: '如果這瓶香水化作一句低語，那會是下列哪一句？',
+                id: 'A3', question: '如果這瓶香水化作一句低語，那會是下列哪一句？',
                 options: [
                     { label: '「世界再喧囂，我也能成為自己的避難所。」', value: '1' },
                     { label: '「你不必總是那麼堅強，允許自己被溫柔地接住吧。」', value: '2' },
@@ -126,122 +110,10 @@ const scentQuizData = {
                 ]
             }
         ],
-        'B': [
-           {
-                id: 'B1',
-                question: '當你步入一個陌生的空間，你希望空氣中率先為你傳遞出什麼樣的隱形訊息？',
-                options: [
-                    { label: '我沒有攻擊性，你可以安心降落。', value: '1' },
-                    { label: '我清楚自己的方向，且擁有不容侵犯的界線。', value: '2' },
-                    { label: '我是一個謎團，等待懂得的人來翻閱。', value: '3' },
-                    { label: '這世界很好玩，而我無所畏懼。', value: '4' }
-                ]
-            },
-            {
-                id: 'B2',
-                question: '為了成為理想的自己，你最想褪去、或者正在克服的舊習慣是什麼？',
-                options: [
-                    { label: '「總是習慣先迎合他人、照顧別人的情緒，卻忘了為自己設立底線。」', value: '1' },
-                    { label: '「容易在眾多選項中反覆猶豫、過度準備，渴望擁有更果決的行動力。」', value: '2' },
-                    { label: '「害怕展露真實情緒與脆弱，總是習慣把心藏得很深、顯得過於冷靜。」', value: '3' },
-                    { label: '「對『完美』的執念太深，不允許自己有任何失誤，身心總是處於緊繃狀態。」', value: '4' },
-                    { label: '「腦海裡的聲音太吵雜，總是過度思慮，難以安靜地活在當下。」', value: '5' },
-                    { label: '「腳步沉重，依然頻頻回頭看著某個過去的遺憾，難以真正走向未來。」', value: '6' },
-                    { label: '「在日復一日的規律與妥協中感到麻木，遺失了對生活的熱情與好奇心。」', value: '7' }
-                ]
-            },
-            {
-                id: 'B3',
-                question: '未來是一張尚未完全攤開的地圖。迎接即將來臨的下一個篇章，下列哪一句話最能帶給你力量？',
-                options: [
-                    { label: '「如果沒有路，就自己劈開一條；如果規則不適用，那就由我來改寫劇本。」', value: '1' },
-                    { label: '「任憑時間在此緩步，沉澱出無可撼動的安定。」', value: '2' },
-                    { label: '「丟掉所有多餘的行囊，越是純粹透明，越能裝下無限可能。」', value: '3' },
-                    { label: '「無論日月更迭，依然選擇用溫柔去愛、去相信。」', value: '4' },
-                    { label: '「不預設終點，也不強求答案，我願成為一陣隨遇而安的風。」', value: '5' },
-                    { label: '「所有的裂痕，都是為了讓光能照進來，終將迎來破曉。」', value: '6' }
-                ]
-            }
-        ], 
-        'C': [
-            {
-                id: 'C1',
-                question: '當他在人群中出現，或當你閉上眼想起他時，下面哪一種描述最符合他帶給你的樣貌呢？',
-                options: [
-                    { label: '早晨帶著涼意的霧氣，安靜、清冷，不輕易隨波逐流。', value: '1' },
-                    { label: '午後穿透亞麻窗簾的光，溫和、柔軟，讓人忍不住想靠近。', value: '2' },
-                    { label: '像燃燒著木柴的微火，沉穩、可靠，有一種深邃的安定感。', value: '3' },
-                    { label: '像傍晚變幻莫測的天色，充滿生命力、靈動且難以捉摸。', value: '4' }
-                ]
-            },
-            {
-                id: 'C2',
-                question: '在你眼中，他藏在表象之下，最真實（或只有你懂）的特質是什麼？',
-                options: [
-                    { label: '看似堅強獨立，其實內心極度柔軟，渴望被溫柔接住。', value: '1' },
-                    { label: '看似隨和好相處，其實內心有著極高的標準與不妥協的底線。', value: '2' },
-                    { label: '看似理智冷靜，但靈魂深處藏著對自由與冒險的浪漫渴望。', value: '3' },
-                    { label: '看似充滿防備、像隻刺蝟，但其實對世界有著最細膩的共情。', value: '4' }
-                ]
-            },
-            {
-                id: 'C3',
-                question: '這瓶香水交到他手上的那一刻，你最希望氣味替你傳達哪一句話？',
-                options: [
-                    { label: '「世界很吵，但願你能一直保有你靈魂裡的安靜與清澈。」', value: '1' },
-                    { label: '「我知道你的刺是為了保護自己，但在我面前，你可以不用那麼堅強。」', value: '2' },
-                    { label: '「這是不被任何人定義的你，也是我最欣賞的你。」', value: '3' },
-                    { label: '「我們的故事還在繼續，這只是其中一個美好的分號。」', value: '4' }
-                ]
-            }
-        ], 
-        'D': [
-            {
-                id: 'D1',
-                question: '如果這段記憶是一張照片，它罩著什麼樣的光線與濾鏡？',
-                options: [
-                    { label: '帶著灰藍調的清晨，空氣微冷，一切尚未甦醒。', value: '1' },
-                    { label: '飽滿的暖橘色夕陽，有一種熱烈卻即將消逝的悵然。', value: '2' },
-                    { label: '昏暗空間裡的一束微光，聚焦在某個安靜的物件上。', value: '3' },
-                    { label: '低飽和的灰綠色調，萬物被雨水洗刷過，帶著濕潤的重量。', value: '4' },
-                    { label: '穿透樹冠的斑駁光影，罩著一層柔軟的藕粉色濾鏡，如夢似幻。', value: '5' },
-                    { label: '稍微過曝的純白光線，乾淨得毫無雜質，帶著一絲眩目。', value: '6' },
-                    { label: '泛黃的復古色調，邊緣微糊，卻保留了當時的溫度。', value: '7' },
-                    { label: '褪去色彩的深藍色午夜，只有冷調的月光或霓虹勾勒出輪廓。', value: '8' }
-                ]
-            },
-            {
-                id: 'D2',
-                question: '當畫面逐漸淡出，這段記憶留在你腦海中的背景音是什麼？',
-                options: [
-                    { label: '筆尖劃過紙張的沙沙聲，或書頁翻動的微小聲響。', value: '1' },
-                    { label: '窗外樹葉被風吹動的摩挲聲，帶著某種遼闊與釋然。', value: '2' },
-                    { label: '某個人低聲的呢喃，或是兩人之間連心跳都能聽見的寂靜。', value: '3' },
-                    { label: '雨滴規律打在窗玻璃上的悶響，將世界與你安穩地隔絕開來。', value: '4' },
-                    { label: '萬物被大雪覆蓋時那種絕對的靜謐，連一根針掉落都能聽見。', value: '5' },
-                    { label: '柴火燃燒到最後的細微劈啪聲，或是燭芯即將熄滅的微光。', value: '6' },
-                    { label: '身體翻動時，棉麻或絲絨布料互相摩擦的輕柔簌簌聲。', value: '7' },
-                    { label: '隔著厚重玻璃，城市遠方極其微弱的車流低頻嗡鳴。', value: '8' }
-                ]
-            },
-            {
-                id: 'D3',
-                question: '若以文學的視角來看，這個瞬間屬於故事的哪一個篇章？',
-                options: [
-                    { label: '沒有前因後果，直接從最深刻的那一秒切入。', value: '1' },
-                    { label: '那是所有喧囂落下後，留下的最後一句未完的對白。', value: '2' },
-                    { label: '其實什麼都沒發生，但心裡知道，一切都不一樣了。', value: '3' }
-                ]
-            }
-        ]
+        'B': [], 'C': [], 'D': [] 
     }
 };
 
-let currentQuizSession = {
-    customerPhone: '',
-    answers: {},       
-    calculatedResult: null 
-};
 // 2. 香氣象限與故事資料庫 (The 6 Archetypes)
 const fragranceProfiles = {
     'intellectual_woods': {
@@ -302,6 +174,7 @@ const fragranceProfiles = {
 
 let currentQuizSession = { customerPhone: '', answers: {}, calculatedResult: null };
 let currentViewedMemberPhone = '';
+
 /* =======================================================
    2. 基礎導覽邏輯 (Navigation)
    ======================================================= */
@@ -309,7 +182,6 @@ function switchTab(tabId) {
     const sections = document.querySelectorAll('.page-section');
     sections.forEach(section => section.style.display = 'none');
     
-    // 切換導覽列按鈕顏色
     const navBtns = document.querySelectorAll('.nav-buttons button');
     navBtns.forEach(btn => btn.classList.remove('active'));
     event.currentTarget.classList.add('active');
@@ -682,7 +554,7 @@ function nextQuestion() {
     const currentQ = quizQueue[currentQuestionIndex];
     currentQuizSession.answers[currentQ.id] = currentQ.multiple ? [...selectedOptionValues] : selectedOptionValues[0];
 
-    // 分流邏輯：如果是 Q1，載入對應支線
+    // 分流邏輯
     if (currentQ.id === 'Q1') {
         const branchChoice = selectedOptionValues[0];
         const branchQuestions = scentQuizData.branches[branchChoice];
@@ -700,23 +572,74 @@ function nextQuestion() {
     }
 }
 
+// =======================================================
+// ★ 演算法引擎：生成專屬調香處方箋
+// =======================================================
 function finishQuiz() {
     document.getElementById('quizContainer').style.display = 'none';
     const resultBox = document.getElementById('quizResult');
-    resultBox.style.display = 'block';
+    const ans = currentQuizSession.answers;
+    
+    let scores = {
+        'intellectual_woods': 0, 'second_skin': 0, 'mineral_horizon': 0, 
+        'grounded_earth': 0, 'velvet_paradox': 0, 'vibrant_awakening': 0
+    };
+
+    const allQuestions = [...scentQuizData.baseQuestions, ...(scentQuizData.branches[ans['Q1']] || [])];
+    
+    let topNote = '佛手柑、清涼微風'; 
+    let middleNote = '純淨白麝香';
+    let baseNote = '溫暖雪松';
+
+    allQuestions.forEach(q => {
+        const selectedValue = ans[q.id];
+        if(!selectedValue || Array.isArray(selectedValue)) return; 
+
+        const selectedOption = q.options.find(opt => opt.value === selectedValue);
+        if (selectedOption) {
+            if(selectedOption.archetype && scores[selectedOption.archetype] !== undefined) {
+                scores[selectedOption.archetype] += 1; 
+            }
+            if(q.id === 'A1') topNote = selectedOption.note;
+            if(q.id === 'Q5') middleNote = selectedOption.note;
+            if(q.id === 'A2') baseNote = selectedOption.note;
+        }
+    });
+
+    const sortedArchetypes = Object.keys(scores).sort((a, b) => scores[b] - scores[a]);
+    const mainProfile = fragranceProfiles[sortedArchetypes[0]];
 
     resultBox.innerHTML = `
-        <h4 style="color: var(--lavender-primary); margin-top:0;">✨ 系統分析完成</h4>
-        <p style="color: var(--text-dark); margin-bottom: 5px;">根據顧客的潛意識偏好，系統推薦以下基調：</p>
-        <select class="form-group" style="margin-top: 10px; width: 100%; padding: 0.8rem; border-color: var(--lavender-primary); font-weight: bold;">
-            <option>冷調木質與茶 (The Intellectual Woods) - 契合度 98%</option>
-            <option>海洋礦物與晨露 (The Mineral Horizon) - 契合度 85%</option>
-            <option>純淨皂香與柔白麝香 (The Second Skin) - 契合度 72%</option>
-        </select>
-        <p style="font-size: 0.85rem; color: #888; margin-top: 15px;">
-            (後台偵測紀錄：Q1選了 ${currentQuizSession.answers['Q1']} 支線，Q6排除了 ${currentQuizSession.answers['Q6']})
-        </p>
+        <div style="border: 1px solid var(--lavender-primary); border-radius: 8px; padding: 2rem; background: #fff; text-align: center;">
+            <p style="color: var(--text-muted); letter-spacing: 2px; font-size: 0.85rem; margin: 0 0 10px 0;">YOUR SCENT NARRATIVE</p>
+            <h3 style="color: var(--lavender-primary); font-size: 1.6rem; margin: 0 0 5px 0;">《${mainProfile.name}》</h3>
+            <p style="font-style: italic; color: var(--text-dark); margin-bottom: 2rem;">${mainProfile.quote}</p>
+            
+            <div style="text-align: left; background: #faf9f8; padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem;">
+                <h4 style="margin-top: 0; color: var(--text-dark); border-bottom: 1px solid #ddd; padding-bottom: 8px;">專屬香氣結構 (The Pyramid)</h4>
+                <p><strong>前調 (Top)</strong>： ${topNote}</p>
+                <p><strong>中調 (Middle)</strong>： ${middleNote}</p>
+                <p><strong>後調 (Base)</strong>： ${baseNote}</p>
+            </div>
+
+            <div style="text-align: left; line-height: 1.8; color: #555; font-size: 0.95rem;">
+                <p><strong>氣味解析：</strong></p>
+                <p>初聞時，<strong>[${topNote}]</strong> 就像 ${getOptionLabel('A1', ans['A1'])}</p>
+                <p>核心的 <strong>[${middleNote}]</strong> ，${mainProfile.storyTemplate[1]}</p>
+                <p>隨著時間推移，香氣會沉澱為 <strong>[${baseNote}]</strong>。${mainProfile.storyTemplate[2]}</p>
+            </div>
+        </div>
     `;
 
+    resultBox.style.display = 'block';
     document.getElementById('postQuizSteps').style.display = 'block';
+}
+
+function getOptionLabel(questionId, value) {
+    if(!value) return '一段未知的旅程。';
+    const allQuestions = [...scentQuizData.baseQuestions, ...scentQuizData.branches['A']];
+    const q = allQuestions.find(q => q.id === questionId);
+    if (!q) return '一段未知的旅程。';
+    const opt = q.options.find(o => o.value === value);
+    return opt ? opt.label.replace(/。$/, '') + '；' : '一段未知的旅程。';
 }
