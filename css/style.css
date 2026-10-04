@@ -742,3 +742,47 @@ h1, h2, h3, h4 {
     font-size: 1.4rem; font-weight: bold; color: var(--lavender-primary); 
     margin-top: 15px; padding-top: 15px; border-top: 1px dashed #ccc; 
 }
+
+/* --- 單一商品狀態下拉選單 --- */
+.cart-item-status-select {
+    padding: 2px 5px;
+    font-size: 0.8rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-top: 5px;
+    background: #f9f9f9;
+    color: var(--text-dark);
+    font-family: inherit;
+}
+
+.cart-item-status-select:disabled {
+    background: #eee;
+    color: #888;
+    cursor: not-allowed;
+    border-color: #ddd;
+}
+
+/* --- 數位感熱紙收據彈窗樣式 --- */
+.receipt-box {
+    background: #fffdf9; /* 帶有微黃的紙張質感 */
+    max-width: 360px;
+    width: 100%;
+    padding: 2.5rem 2rem;
+    border-radius: 4px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+    font-family: 'Courier New', Courier, 'Noto Sans TC', monospace; /* 收銀機等寬字體 */
+    position: relative;
+    border-top: none;
+}
+
+/* 收據上方的鋸齒撕紙邊緣特效 */
+.receipt-zigzag {
+    position: absolute;
+    top: -10px;
+    left: 0;
+    width: 100%;
+    height: 10px;
+    background: linear-gradient(-45deg, transparent 33.33%, #fffdf9 33.33%, #fffdf9 66.66%, transparent 66.66%), 
+                linear-gradient(45deg, transparent 33.33%, #fffdf9 33.33%, #fffdf9 66.66%, transparent 66.66%);
+    background-size: 20px 20px;
+}
