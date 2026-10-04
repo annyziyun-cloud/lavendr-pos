@@ -607,27 +607,25 @@ function getOptionLabel(questionId, value) {
 
 
 /* =======================================================
-   6. 分頁三：結帳工作台 (POS Checkout & 促銷引擎)
+   6. 分頁三：結帳工作台 (進階金流與數位收據)
    ======================================================= */
-// 商品目錄庫 (包含特定優惠系列)
 const productCatalog = [
     { id: 'P01', name: '客製化調香香水 (50ml)', series: '調香訂製', price: 3280 },
     { id: 'P02', name: '保濕潔手露', series: '淨化系列', price: 850 },
     { id: 'P03', name: '舒緩沐浴油', series: '淨化系列', price: 1250 },
     { id: 'P04', name: '香氛蠟燭', series: '居家空間系列', price: 1580 },
     { id: 'P05', name: '大理石擴香石', series: '居家空間系列', price: 680 },
-    { id: 'P06', name: '護髮精油', series: '養護精油系列', price: 1280 }
+    { id: 'P06', name: '香氛護髮精油', series: '養護精油系列', price: 800 }
 ];
 
 let shoppingCart = [];
+let currentTotalForCheckout = 0; // 用於全域計算找零
 
-// 初始化結帳台
 function initPOS() {
     renderProductCatalog();
     updateCartUI();
 }
 
-// 渲染左側商品清單
 function renderProductCatalog() {
     const grid = document.getElementById('productGrid');
     grid.innerHTML = '';
@@ -642,27 +640,57 @@ function renderProductCatalog() {
     });
 }
 
-// 加入購物車
+// 加入購物車 (預設一般商品為已領取，客製調香強制為待取貨)
 function addToCart(productId) {
     const product = productCatalog.find(p => p.id === productId);
     if(product) {
-        shoppingCart.push(product);
+        // 使用解構賦值複製商品，並給予獨立的狀態屬性
+        let defaultStatus = product.name.includes('客製化調香') ? '待取貨' : '已領取';
+        shoppingCart.push({ ...product, status: defaultStatus });
         updateCartUI();
     }
 }
 
-// 移除購物車商品
+// 修改購物車內單一商品的狀態
+function updateItemStatus(index, status) {
+    shoppingCart[index].status = status;
+}
+
 function removeFromCart(index) {
     shoppingCart.splice(index, 1);
     updateCartUI();
 }
 
-// ★ 核心促銷引擎：更新購物車與折扣計算
+// 動態切換付款輸入欄位
+function togglePaymentFields() {
+    const method = document.getElementById('cartPayment').value;
+    document.getElementById('payCash').style.display = method === '現金' ? 'block' : 'none';
+    document.getElementById('payCredit').style.display = method === '信用卡' ? 'block' : 'none';
+    document.getElementById('payMobile').style.display = method === '行動支付' ? 'block' : 'none';
+    calculateChange(); // 切換時重新計算找零顯示
+}
+
+// 計算現金找零
+function calculateChange() {
+    const received = parseInt(document.getElementById('cashReceived').value) || 0;
+    const change = received - currentTotalForCheckout;
+    const display = document.getElementById('changeAmountDisplay');
+    
+    if (document.getElementById('cartPayment').value !== '現金') return;
+
+    if (change < 0) {
+        display.textContent = `金額不足：還差 $${Math.abs(change).toLocaleString()}`;
+        display.style.color = '#d9534f';
+    } else {
+        display.textContent = `找零：$${change.toLocaleString()}`;
+        display.style.color = 'var(--lavender-primary)';
+    }
+}
+
 function updateCartUI() {
     const customerInfo = document.getElementById('cartCustomerInfo');
     const member = memberDatabase[currentViewedMemberPhone];
 
-    // 更新顧客資訊看板
     if (member) {
         customerInfo.innerHTML = `<strong>👤 結帳對象：${member.name}</strong> 
                                   <br><span style="color:#888; font-size:0.85rem;">目前累積點數: ${member.points} pts ｜ 
@@ -671,107 +699,135 @@ function updateCartUI() {
         customerInfo.innerHTML = `<strong>🚶‍♂️ 非會員結帳 (Walk-in)</strong> <br><span style="color:#888; font-size:0.85rem;">無法累積點數或使用專屬優惠</span>`;
     }
 
-    // 渲染購物車清單
     const cartItemsDiv = document.getElementById('cartItems');
     cartItemsDiv.innerHTML = '';
     let subtotal = 0;
-    let targetSeriesTotal = 0; // 用來計算「淨化系列」的總額
+    let targetSeriesTotal = 0;
 
     shoppingCart.forEach((item, index) => {
         subtotal += item.price;
-        if(item.series === '淨化系列') {
-            targetSeriesTotal += item.price;
-        }
+        if(item.series === '淨化系列') targetSeriesTotal += item.price;
 
+        // 客製化調香鎖定為待取貨不可改，其他商品可讓店員切換
+        const isCustomPerfume = item.name.includes('客製化調香');
+        
         cartItemsDiv.innerHTML += `
-            <div class="cart-item">
+            <div class="cart-item" style="align-items: flex-start;">
                 <div class="cart-item-name">
-                    ${item.name} <br><span style="font-size:0.75rem; color:#888;">${item.series}</span>
+                    ${item.name} <br>
+                    <span style="font-size:0.75rem; color:#888;">${item.series}</span><br>
+                    <select class="cart-item-status-select" onchange="updateItemStatus(${index}, this.value)" ${isCustomPerfume ? 'disabled' : ''}>
+                        <option value="已領取" ${item.status === '已領取' ? 'selected' : ''}>有現貨 (直接帶走)</option>
+                        <option value="待取貨" ${item.status === '待取貨' ? 'selected' : ''}>需訂貨 (待取單)</option>
+                    </select>
                 </div>
-                <div class="cart-item-price">$${item.price}</div>
-                <button class="btn-remove" onclick="removeFromCart(${index})">✕</button>
+                <div style="text-align: right;">
+                    <div class="cart-item-price">$${item.price.toLocaleString()}</div>
+                    <button class="btn-remove" style="margin-top: 5px;" onclick="removeFromCart(${index})">移除</button>
+                </div>
             </div>
         `;
     });
 
-    // 計算滿2000折200優惠 (特定系列、會員專屬、限用一次)
     let discount = 0;
     if (member && !member.usedSeriesDiscount && targetSeriesTotal >= 2000) {
         discount = 200;
     }
 
-    const total = subtotal - discount;
+    currentTotalForCheckout = subtotal - discount; // 更新全域變數供現金找零使用
 
-    // 更新金額顯示
     document.getElementById('cartSubtotal').textContent = `$${subtotal.toLocaleString()}`;
     document.getElementById('cartDiscount').textContent = `-$${discount}`;
-    document.getElementById('cartTotal').textContent = `$${total.toLocaleString()}`;
+    document.getElementById('cartTotal').textContent = `$${currentTotalForCheckout.toLocaleString()}`;
+    
+    calculateChange(); // 更新購物車時，同步刷新找零金額
 }
 
-// 執行結帳
 function processCheckout() {
     if (shoppingCart.length === 0) { alert('購物車是空的！'); return; }
 
-    let subtotal = 0;
-    let targetSeriesTotal = 0;
-    shoppingCart.forEach(item => {
-        subtotal += item.price;
-        if(item.series === '薰衣草淨化系列') targetSeriesTotal += item.price;
-    });
-
-    const member = memberDatabase[currentViewedMemberPhone];
-    let discount = 0;
-    
-    // 計算折扣
-    if (member && !member.usedSeriesDiscount && targetSeriesTotal >= 2000) {
-        discount = 200;
-        member.usedSeriesDiscount = true; 
-    }
-    
-    const total = subtotal - discount;
-
-    // ★ 讀取結帳設定欄位
-    const carrier = document.getElementById('cartCarrier').value.trim();
     const paymentMethod = document.getElementById('cartPayment').value;
-    const orderStatus = document.getElementById('cartOrderStatus').value; // '已領取' 或 '待取貨'
+    let payDetailText = '';
+
+    // ★ 金流防呆驗證
+    if (paymentMethod === '現金') {
+        const received = parseInt(document.getElementById('cashReceived').value) || 0;
+        if (received < currentTotalForCheckout) { alert('實收金額不足！請確認顧客給付金額。'); return; }
+        payDetailText = `實收：$${received.toLocaleString()} / 找零：$${(received - currentTotalForCheckout).toLocaleString()}`;
+    } else if (paymentMethod === '信用卡') {
+        const card = document.getElementById('creditCardNum').value.trim();
+        if (!card) { alert('請輸入信用卡卡號！'); return; }
+        payDetailText = `卡號末四碼：**** ${card.slice(-4).padStart(4, '0')}`;
+    } else if (paymentMethod === '行動支付') {
+        const tid = document.getElementById('mobileTransactionId').value.trim();
+        if (!tid) { alert('請輸入行動支付的交易成功序號！'); return; }
+        payDetailText = `交易序號：${tid}`;
+    }
+
+    // 計算優惠與寫入會員資料庫
+    let subtotal = 0;
+    shoppingCart.forEach(item => subtotal += item.price);
+    const discount = subtotal - currentTotalForCheckout;
+    const member = memberDatabase[currentViewedMemberPhone];
+    const carrier = document.getElementById('cartCarrier').value.trim();
 
     if (member) {
-        const earnedPoints = Math.floor(total / 100);
-        member.points += earnedPoints;
-        member.annualSpend += total;
+        if (discount > 0) member.usedSeriesDiscount = true;
+        member.points += Math.floor(currentTotalForCheckout / 100);
+        member.annualSpend += currentTotalForCheckout;
         
-        // 寫入會員訂單 (依照選擇的取貨狀態連動)
+        // 將購物車商品依照各自的狀態(現貨/待取)寫入訂單庫
         shoppingCart.forEach(item => {
             member.orders.unshift({ 
                 id: 'ORD-' + Math.floor(Math.random() * 10000), 
                 item: item.name, 
-                status: orderStatus // ★ 動態帶入「已領取」或「待取貨」
+                status: item.status 
             });
         });
-
-        // 組合成功提示訊息
-        let msg = `✅ 結帳成功！總金額：$${total.toLocaleString()}。\n`;
-        msg += `付款方式：${paymentMethod}\n`;
-        if (carrier) msg += `載具條碼：${carrier}\n`;
-        if (discount > 0) msg += `(已自動折抵薰衣草系列滿額 $200)\n`;
-        msg += `已為 ${member.name} 累積 ${earnedPoints} 點。`;
-        
-        if (orderStatus === '待取貨') {
-            msg += `\n\n📌 系統提示：商品已自動列入顧客的「待取貨單」中。`;
-        }
-        
-        alert(msg);
-    } else {
-        let msg = `✅ 非會員結帳成功！總金額：$${total.toLocaleString()}。\n`;
-        msg += `付款方式：${paymentMethod}\n`;
-        if (carrier) msg += `載具條碼：${carrier}\n`;
-        alert(msg);
     }
 
-    // 清空購物車與表單
+    // 呼叫數位收據生成器
+    generateReceipt(subtotal, discount, currentTotalForCheckout, paymentMethod, payDetailText, carrier);
+}
+
+// 產生並顯示數位收據
+function generateReceipt(subtotal, discount, total, method, detail, carrier) {
+    const now = new Date();
+    document.getElementById('receiptDate').textContent = now.toLocaleString('zh-TW', { hour12: false });
+    
+    const itemsContainer = document.getElementById('receiptItems');
+    itemsContainer.innerHTML = shoppingCart.map(item => `
+        <div style="display:flex; justify-content:space-between; margin-bottom: 10px; padding-bottom: 5px; border-bottom: 1px dotted #ccc;">
+            <div style="flex:1;">
+                <div style="font-weight: bold;">${item.name}</div>
+                <div style="font-size:0.75rem; color:#888;">[狀態: ${item.status}]</div>
+            </div>
+            <div style="font-weight: bold;">$${item.price.toLocaleString()}</div>
+        </div>
+    `).join('');
+
+    document.getElementById('rcptSub').textContent = `$${subtotal.toLocaleString()}`;
+    document.getElementById('rcptDisc').textContent = `-$${discount}`;
+    document.getElementById('rcptTotal').textContent = `$${total.toLocaleString()}`;
+
+    document.getElementById('rcptPayMethod').textContent = method;
+    document.getElementById('rcptPayDetail').textContent = detail;
+    document.getElementById('rcptCarrier').textContent = carrier ? `載具條碼：${carrier}` : '';
+
+    // 顯示收據彈窗
+    document.getElementById('receiptModal').style.display = 'flex';
+}
+
+// 關閉收據並清空購物車
+function closeReceipt() {
+    document.getElementById('receiptModal').style.display = 'none';
     shoppingCart = [];
     document.getElementById('cartCarrier').value = '';
+    document.getElementById('creditCardNum').value = '';
+    document.getElementById('cashReceived').value = '';
+    document.getElementById('mobileTransactionId').value = '';
     document.getElementById('cartPayment').selectedIndex = 0;
-    document.getElementById('cartOrderStatus').selectedIndex = 0;
+    
+    togglePaymentFields();
     updateCartUI();
 }
