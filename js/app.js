@@ -716,13 +716,13 @@ function processCheckout() {
     let targetSeriesTotal = 0;
     shoppingCart.forEach(item => {
         subtotal += item.price;
-        if(item.series === '淨化系列') targetSeriesTotal += item.price;
+        if(item.series === '薰衣草淨化系列') targetSeriesTotal += item.price;
     });
 
     const member = memberDatabase[currentViewedMemberPhone];
     let discount = 0;
     
-    // 如果符合優惠條件，結帳時將標籤改為「已使用」
+    // 計算折扣
     if (member && !member.usedSeriesDiscount && targetSeriesTotal >= 2000) {
         discount = 200;
         member.usedSeriesDiscount = true; 
@@ -730,26 +730,48 @@ function processCheckout() {
     
     const total = subtotal - discount;
 
+    // ★ 讀取結帳設定欄位
+    const carrier = document.getElementById('cartCarrier').value.trim();
+    const paymentMethod = document.getElementById('cartPayment').value;
+    const orderStatus = document.getElementById('cartOrderStatus').value; // '已領取' 或 '待取貨'
+
     if (member) {
-        // 寫入會員資料庫：點數 (100元1點)、累積消費、訂單紀錄
         const earnedPoints = Math.floor(total / 100);
         member.points += earnedPoints;
         member.annualSpend += total;
         
+        // 寫入會員訂單 (依照選擇的取貨狀態連動)
         shoppingCart.forEach(item => {
             member.orders.unshift({ 
                 id: 'ORD-' + Math.floor(Math.random() * 10000), 
                 item: item.name, 
-                status: '已領取' // 現場結帳直接算已領取
+                status: orderStatus // ★ 動態帶入「已領取」或「待取貨」
             });
         });
 
-        alert(`✅ 結帳成功！總金額：$${total.toLocaleString()}。\n${discount > 0 ? '(已自動折抵淨化系列滿額 $200)\n' : ''}已為 ${member.name} 累積 ${earnedPoints} 點。`);
+        // 組合成功提示訊息
+        let msg = `✅ 結帳成功！總金額：$${total.toLocaleString()}。\n`;
+        msg += `付款方式：${paymentMethod}\n`;
+        if (carrier) msg += `載具條碼：${carrier}\n`;
+        if (discount > 0) msg += `(已自動折抵薰衣草系列滿額 $200)\n`;
+        msg += `已為 ${member.name} 累積 ${earnedPoints} 點。`;
+        
+        if (orderStatus === '待取貨') {
+            msg += `\n\n📌 系統提示：商品已自動列入顧客的「待取貨單」中。`;
+        }
+        
+        alert(msg);
     } else {
-        alert(`✅ 非會員結帳成功！總金額：$${total.toLocaleString()}。`);
+        let msg = `✅ 非會員結帳成功！總金額：$${total.toLocaleString()}。\n`;
+        msg += `付款方式：${paymentMethod}\n`;
+        if (carrier) msg += `載具條碼：${carrier}\n`;
+        alert(msg);
     }
 
-    // 清空購物車
+    // 清空購物車與表單
     shoppingCart = [];
+    document.getElementById('cartCarrier').value = '';
+    document.getElementById('cartPayment').selectedIndex = 0;
+    document.getElementById('cartOrderStatus').selectedIndex = 0;
     updateCartUI();
 }
