@@ -1,13 +1,13 @@
 /* =======================================================
    1. 全域資料庫與狀態管理 (Global State)
    ======================================================= */
-// 模擬會員資料庫 
 let memberDatabase = {
     '0900000000': {
         name: '醬寶寶', phone: '0900000000', gender: '男', birthday: '1998-05-20', idNumber: 'A123456789',
         tier: '薰衣草花田 Lavender', points: 2500, annualSpend: 15800,
         orders: [{ id: 'ORD-001', item: '客製化香水 (木質調)', status: '待取貨' }],
-        reservations: [{ date: '2026-10-10 14:00-15:00', type: '一對一調香訂製' }]
+        reservations: [{ date: '2026-10-10 14:00-15:00', type: '一對一調香訂製' }],
+        usedSeriesDiscount: false // ★ 新增：紀錄是否用過特定系列優惠
     },
     '0911111111': {
         name: 'Anny', phone: '0911111111', gender: '女', birthday: '2003-11-26', idNumber: 'F223344556',
@@ -16,15 +16,16 @@ let memberDatabase = {
             { id: 'ORD-002', item: '薰衣草保濕潔手露', status: '待取貨' },
             { id: 'ORD-003', item: '晨露花香香氛蠟燭', status: '已領取' }
         ],
-        reservations: []
+        reservations: [],
+        usedSeriesDiscount: true // ★ 模擬：Anny 已經用過優惠了
     }
 };
+
+let currentViewedMemberPhone = '';
 
 /* =======================================================
    ★ Lavend/r 調香系統大腦：題目、標籤與故事資料庫
    ======================================================= */
-
-// 1. 核心題庫 (Phase 1 & Phase 2)
 const scentQuizData = {
     baseQuestions: [
         {
@@ -62,7 +63,7 @@ const scentQuizData = {
             ]
         },
         {
-            id: 'Q5', question: '這瓶香水中，你最「不可或缺」的核心靈魂是什麼？',
+            id: 'Q5', question: '這瓶香水中，你最「不可不可或缺」的核心靈魂是什麼？',
             options: [
                 { label: '茶香與木質的沉穩（伯爵茶、檀香、雪松）', value: 'A', archetype: 'intellectual_woods', note: '伯爵茶、檀香' },
                 { label: '花朵與果實的靈動（玫瑰、鈴蘭、無花果、柑橘）', value: 'B', archetype: 'vibrant_awakening', note: '千葉玫瑰、水蜜桃' },
@@ -79,9 +80,8 @@ const scentQuizData = {
             ]
         }
     ],
-    // 支線題庫
     branches: {
-        'A': [ // 支線 A：內在庇護所
+        'A': [ 
             {
                 id: 'A1', question: '哪一個瞬間最能讓你感到絕對的「愜意」與放鬆？',
                 options: [
@@ -110,176 +110,38 @@ const scentQuizData = {
                 ]
             }
         ],
-        'B': [
-            {
-                id: 'B1', question: '當你步入一個陌生的空間，你希望空氣中率先為你傳遞出什麼樣的隱形訊息？',
-                options: [
-                    { label: '我沒有攻擊性，你可以安心降落。', value: '1', note: '白茶、洋甘菊、鈴蘭、棉花籽' },
-                    { label: '我清楚自己的方向，且擁有不容侵犯的界線。', value: '2', note: '苦橙葉、雪松、香根草、醛香' },
-                    { label: '我是一個謎團，等待懂得的人來翻閱。', value: '3', note: '玫瑰、琥珀、粉紅胡椒' },
-                    { label: '這世界很好玩，而我無所畏懼。', value: '4', note: '甜橙、水蜜桃、小蒼蘭' }
-                ]
-            },
-            {
-                id: 'B2', question: '為了成為理想的自己，你最想褪去、或者正在克服的舊習慣是什麼？',
-                options: [
-                    { label: '總是習慣先迎合他人、照顧別人的情緒，卻忘了為自己設立底線。', value: '1', note: '莎草、黑胡椒、雪松' },
-                    { label: '容易在眾多選項中反覆猶豫、過度準備，渴望擁有更果決的行動力。', value: '2', note: '香根草、葡萄柚、苦橙' },
-                    { label: '害怕展露真實情緒與脆弱，總是習慣把心藏得很深、顯得過於冷靜。', value: '3', note: '千葉玫瑰、琥珀、安息香' },
-                    { label: '對『完美』的執念太深，不允許自己有任何失誤，身心總是處於緊繃狀態。', value: '4', note: '薰衣草、白茶、快樂鼠尾草' },
-                    { label: '腦海裡的聲音太吵雜，總是過度思慮，難以安靜地活在當下。', value: '5', note: '廣藿香、檀香、癒創木' },
-                    { label: '腳步沉重，依然頻頻回頭看著某個過去的遺憾，難以真正走向未來。', value: '6', note: '薄荷、醛香、海鹽' },
-                    { label: '在日復一日的規律與妥協中感到麻木，遺失了對生活的熱情與好奇心。', value: '7', note: '無花果、血橙、粉紅胡椒' }
-                ]
-            },
-            {
-                id: 'B3', question: '未來是一張尚未完全攤開的地圖。迎接即將來臨的下一個篇章，下列哪一句話最能帶給你力量？',
-                options: [
-                    { label: '「如果沒有路，就自己劈開一條；如果規則不適用，那就由我來改寫劇本。」', value: '1' },
-                    { label: '「任憑時間在此緩步，沉澱出無可撼動的安定。」', value: '2' },
-                    { label: '「丟掉所有多餘的行囊，越是純粹透明，越能裝下無限可能。」', value: '3' },
-                    { label: '「無論日月更迭，依然選擇用溫柔去愛、去相信。」', value: '4' },
-                    { label: '「不預設終點，也不強求答案，我願成為一陣隨遇而安的風。」', value: '5' },
-                    { label: '「所有的裂痕，都是為了讓光能照進來，終將迎來破曉。」', value: '6' }
-                ]
-            }
-        ], 
-        'C': [
-            {
-                id: 'C1', question: '當他在人群中出現，或當你閉上眼想起他時，下面哪一種描述最符合他帶給你的樣貌呢？',
-                options: [
-                    { label: '早晨帶著涼意的霧氣，安靜、清冷，不輕易隨波逐流。', value: '1', note: '柑橘、薄荷、醛香' },
-                    { label: '午後穿透亞麻窗簾的光，溫和、柔軟，讓人忍不住想靠近。', value: '2', note: '白茶、佛手柑、無花果' },
-                    { label: '像燃燒著木柴的微火，沉穩、可靠，有一種深邃的安定感。', value: '3', note: '黑胡椒、苦橙葉、雪松' },
-                    { label: '像傍晚變幻莫測的天色，充滿生命力、靈動且難以捉摸。', value: '4', note: '粉紅胡椒、莓果、微醺酒香' }
-                ]
-            },
-            {
-                id: 'C2', question: '在你眼中，他藏在表象之下，最真實（或只有你懂）的特質是什麼？',
-                options: [
-                    { label: '看似堅強獨立，其實內心極度柔軟，渴望被溫柔接住。', value: '1', note: '白麝香、羊絨木' },
-                    { label: '看似隨和好相處，其實內心有著極高的標準與不妥協的底線。', value: '2', note: '香根草' },
-                    { label: '看似理智冷靜，但靈魂深處藏著對自由與冒險的浪漫渴望。', value: '3', note: '廣藿香、皮革' },
-                    { label: '看似充滿防備、像隻刺蝟，但其實對世界有著最細膩的共情。', value: '4', note: '琥珀' }
-                ]
-            },
-            {
-                id: 'C3', question: '如果用一種「空間狀態」來形容你們之間的相處，那會是哪一種畫面？',
-                options: [
-                    { label: '「兩張並排的單人沙發」—— 不需要一直說話，即使在同一個空間做各自的事也覺得安心。', value: '1', note: '皂香、棉花' },
-                    { label: '「深夜裡的微光吧台」—— 總是能與彼此交換最深層、甚至有點尖銳的哲學與思辨。', value: '2', note: '伯爵茶、菸草、玫瑰' },
-                    { label: '「沒有邊界的曠野」—— 在彼此面前可以卸下所有包袱，是最真實、最純粹的自己。', value: '3', note: '海洋氣息、鼠尾草、鈴蘭' }
-                ]
-            },
-            {
-                id: 'C4', question: '這瓶香水交到他手上的那一刻，你最希望氣味替你傳達哪一句話？',
-                options: [
-                    { label: '「世界很吵，但願你能一直保有你靈魂裡的安靜與清澈。」', value: '1' },
-                    { label: '「我知道你的刺是為了保護自己，但在我面前，你可以不用那麼堅強。」', value: '2' },
-                    { label: '「這是不被任何人定義的你，也是我最欣賞的你。」', value: '3' },
-                    { label: '「我們的故事還在繼續，這只是其中一個美好的分號。」', value: '4' }
-                ]
-            }
-        ], 
-        'D': [
-            {
-                id: 'D1', question: '如果這段記憶是一張照片，它罩著什麼樣的光線與濾鏡？',
-                options: [
-                    { label: '帶著灰藍調的清晨，空氣微冷，一切尚未甦醒。', value: '1', note: '海鹽、薄荷、杜松子' },
-                    { label: '飽滿的暖橘色夕陽，有一種熱烈卻即將消逝的悵然。', value: '2', note: '甜橙、肉桂、菸草、粉紅胡椒' },
-                    { label: '昏暗空間裡的一束微光，聚焦在某個安靜的物件上。', value: '3', note: '乾燥木柴、莎草、廣藿香' },
-                    { label: '低飽和的灰綠色調，萬物被雨水洗刷過，帶著濕潤的重量。', value: '4', note: '橡木苔、苦橙葉、無花果葉' },
-                    { label: '穿透樹冠的斑駁光影，罩著一層柔軟的藕粉色濾鏡，如夢似幻。', value: '5', note: '白茶、洋甘菊、鳶尾花' },
-                    { label: '稍微過曝的純白光線，乾淨得毫無雜質，帶著一絲眩目。', value: '6', note: '醛香、鈴蘭、白麝香' },
-                    { label: '泛黃的復古色調，邊緣微糊，卻保留了當時的溫度。', value: '7', note: '香草、零陵香豆、羊絨木' },
-                    { label: '褪去色彩的深藍色午夜，只有冷調的月光或霓虹勾勒出輪廓。', value: '8', note: '晚香玉、沒藥' }
-                ]
-            },
-            {
-                id: 'D2', question: '當畫面逐漸淡出，這段記憶留在你腦海中的背景音是什麼？',
-                options: [
-                    { label: '筆尖劃過紙張的沙沙聲，或書頁翻動的微小聲響。', value: '1', note: '廣藿香、皮革、莎草' },
-                    { label: '窗外樹葉被風吹動的摩挲聲，帶著某種遼闊與釋然。', value: '2', note: '雪松、橡木苔、扁柏' },
-                    { label: '某個人低聲的呢喃，或是兩人之間連心跳都能聽見的寂靜。', value: '3', note: '白麝香、香草、琥珀' },
-                    { label: '雨滴規律打在窗玻璃上的悶響，將世界與你安穩地隔絕開來。', value: '4', note: '香根草' },
-                    { label: '萬物被大雪覆蓋時那種絕對的靜謐，連一根針掉落都能聽見。', value: '5', note: '龍涎醚' },
-                    { label: '柴火燃燒到最後的細微劈啪聲，或是燭芯即將熄滅的微光。', value: '6', note: '檀香、沉香、乳香、沒藥' },
-                    { label: '身體翻動時，棉麻或絲絨布料互相摩擦的輕柔簌簌聲。', value: '7', note: '鳶尾花根、羊絨木、黃葵籽' },
-                    { label: '隔著厚重玻璃，城市遠方極其微弱的車流低頻嗡鳴。', value: '8', note: '龍涎香' }
-                ]
-            },
-            {
-                id: 'D3', question: '若以文學的視角來看，這個瞬間屬於故事的哪一個篇章？',
-                options: [
-                    { label: '沒有前因後果，直接從最深刻的那一秒切入。', value: '1' },
-                    { label: '那是所有喧囂落下後，留下的最後一句未完的對白。', value: '2' },
-                    { label: '其實什麼都沒發生，但心裡知道，一切都不一樣了。', value: '3' }
-                ]
-            }
-        ] 
+        'B': [], 'C': [], 'D': [] 
     }
 };
 
-// 2. 香氣象限與故事資料庫 (The 6 Archetypes)
 const fragranceProfiles = {
     'intellectual_woods': {
-        name: '冷調木質與茶 (The Intellectual Woods)',
-        quote: '「在極致的克制與秩序中，往往藏著最深沉的熱愛。」',
-        storyTemplate: [
-            '推開極簡純白的空間，大理石桌面乾淨無瑕，只放著一杯散發著裊裊熱氣的伯爵茶。',
-            '這是屬於理智者的氣息，外表看似高冷、保持著優雅的界線感，內心卻對世界有著最細膩而通透的解讀。',
-            '它的香氣俐落而有支撐力，是一件能在喧囂中維持自我秩序的隱形戰袍。'
-        ]
+        name: '冷調木質與茶 (The Intellectual Woods)', quote: '「在極致的克制與秩序中，往往藏著最深沉的熱愛。」',
+        storyTemplate: ['推開極簡純白的空間，大理石桌面乾淨無瑕，只放著一杯散發著裊裊熱氣的伯爵茶。','這是屬於理智者的氣息，外表看似高冷、保持著優雅的界線感，內心卻對世界有著最細膩而通透的解讀。','它的香氣俐落而有支撐力，是一件能在喧囂中維持自我秩序的隱形戰袍。']
     },
     'second_skin': {
-        name: '純淨皂香與柔白麝香 (The Second Skin)',
-        quote: '「你不必總是那麼堅強，允許自己被溫柔地接住吧。」',
-        storyTemplate: [
-            '早晨的陽光透過亞麻窗簾，輕輕灑落在剛洗淨的純白床單上。',
-            '這是不具任何攻擊性的溫柔，宛如第二層肌膚般的陪伴。',
-            '它不急於彰顯個性，而是在你疲憊時，用微溫的膚觸感卸下你所有的防備，給你一個最安穩、沒有評價的擁抱。'
-        ]
+        name: '純淨皂香與柔白麝香 (The Second Skin)', quote: '「你不必總是那麼堅強，允許自己被溫柔地接住吧。」',
+        storyTemplate: ['早晨的陽光透過亞麻窗簾，輕輕灑落在剛洗淨的純白床單上。','這是不具任何攻擊性的溫柔，宛如第二層肌膚般的陪伴。','它不急於彰顯個性，而是在你疲憊時，用微溫的膚觸感卸下你所有的防備，給你一個最安穩、沒有評價的擁抱。']
     },
     'mineral_horizon': {
-        name: '海洋礦物與晨露 (The Mineral Horizon)',
-        quote: '「任憑時間在此緩步，沉澱出無可撼動的安定。」',
-        storyTemplate: [
-            '獨自漫步在清晨還帶著薄霧的灰藍色海灘，迎面而來的是帶有鹽分與冷空氣的微風。',
-            '獻給渴望抽離、嚮往絕對自由的靈魂。',
-            '這股帶有透明感與空間感的氣息，宛如將一切繁冗斷捨離，只留下最純粹的自己，是通往內在平靜的鑰匙。'
-        ]
+        name: '海洋礦物與晨露 (The Mineral Horizon)', quote: '「任憑時間在此緩步，沉澱出無可撼動的安定。」',
+        storyTemplate: ['獨自漫步在清晨還帶著薄霧的灰藍色海灘，迎面而來的是帶有鹽分與冷空氣的微風。','獻給渴望抽離、嚮往絕對自由的靈魂。','這股帶有透明感與空間感的氣息，宛如將一切繁冗斷捨離，只留下最純粹的自己，是通往內在平靜的鑰匙。']
     },
     'grounded_earth': {
-        name: '大地草本與綠意 (The Grounded Earth)',
-        quote: '「就讓心裡保留一片下雨的空間，陰影裡也有它的美意。」',
-        storyTemplate: [
-            '午後的一場大雨，洗刷了森林裡的泥土與青草，空氣中帶著微濕潤的重量。',
-            '這是一款向下扎根的氣味，充滿生命經歷過風雨後的韌性。',
-            '適合那些內心豐富、懂得欣賞事物殘缺美感，並習慣在安靜與復古的氛圍中積蓄力量的敘事者。'
-        ]
+        name: '大地草本與綠意 (The Grounded Earth)', quote: '「就讓心裡保留一片下雨的空間，陰影裡也有它的美意。」',
+        storyTemplate: ['午後的一場大雨，洗刷了森林裡的泥土與青草，空氣中帶著微濕潤的重量。','這是一款向下扎根的氣味，充滿生命經歷過風雨後的韌性。','適合那些內心豐富、懂得欣賞事物殘缺美感，並習慣在安靜與復古的氛圍中積蓄力量的敘事者。']
     },
     'velvet_paradox': {
-        name: '辛香微醺與皮革 (The Velvet Paradox)',
-        quote: '「平靜的水面下，是旁人看不見的暗湧。」',
-        storyTemplate: [
-            '深夜裡點著微光的吧台，或是翻閱到一半、散發著墨水味的陳年舊書。',
-            '帶有微微的辛辣與煙燻感，像是為了保護柔軟內心而長出的優雅刺。',
-            '氣味深邃且充滿未說出口的潛台詞，反差極大，需要時間一層層剝開，極具魅惑與知性的餘韻。'
-        ]
+        name: '辛香微醺與皮革 (The Velvet Paradox)', quote: '「平靜的水面下，是旁人看不見的暗湧。」',
+        storyTemplate: ['深夜裡點著微光的吧台，或是翻閱到一半、散發著墨水味的陳年舊書。','帶有微微的辛辣與煙燻感，像是為了保護柔軟內心而長出的優雅刺。','氣味深邃且充滿未說出口的潛台詞，反差極大，需要時間一層層剝開，極具魅惑與知性的餘韻。']
     },
     'vibrant_awakening': {
-        name: '明亮柑橘與花果 (The Vibrant Awakening)',
-        quote: '「故事從最精彩的半途開始，沒有起點，也沒有終點。」',
-        storyTemplate: [
-            '折射著光線的流動稜鏡，將沉悶的空氣瞬間劃破。',
-            '跳躍的多汁果香與靈動的花朵，瓦解了過度的緊繃與猶豫不決。',
-            '這是破繭而出的生命力，帶有微氣泡般的明亮感，宣告著對未知的熱愛與無所畏懼，隨時準備好迎向下一場冒險。'
-        ]
+        name: '明亮柑橘與花果 (The Vibrant Awakening)', quote: '「故事從最精彩的半途開始，沒有起點，也沒有終點。」',
+        storyTemplate: ['折射著光線的流動稜鏡，將沉悶的空氣瞬間劃破。','跳躍的多汁果香與靈動的花朵，瓦解了過度的緊繃與猶豫不決。','這是破繭而出的生命力，帶有微氣泡般的明亮感，宣告著對未知的熱愛與無所畏懼，隨時準備好迎向下一場冒險。']
     }
 };
 
 let currentQuizSession = { customerPhone: '', answers: {}, calculatedResult: null };
-let currentViewedMemberPhone = '';
 
 /* =======================================================
    2. 基礎導覽邏輯 (Navigation)
@@ -301,6 +163,11 @@ function switchTab(tabId) {
             renderProfileCard(member);
             document.getElementById('memberResult').style.display = 'block';
         }
+    }
+    
+    // ★ 切換到 POS 時，自動載入商品與當前客人資訊
+    if (tabId === 'tab-pos') {
+        initPOS();
     }
 }
 
@@ -353,7 +220,8 @@ function submitRegistration(event) {
 
     memberDatabase[phone] = {
         name: name, phone: phone, gender: gender, birthday: birthday, idNumber: idNum,
-        tier: '微風草本 Seedling', points: 0, annualSpend: 0, orders: [], reservations: []
+        tier: '微風草本 Seedling', points: 0, annualSpend: 0, orders: [], reservations: [],
+        usedSeriesDiscount: false
     };
 
     alert('新客檔案建立成功！');
@@ -552,7 +420,7 @@ function confirmBooking() {
 }
 
 /* =======================================================
-   5. 分頁二：專屬調香工作台 (多選排他問卷引擎)
+   5. 分頁二：專屬調香工作台 (問卷與演算法)
    ======================================================= */
 let quizQueue = []; 
 let currentQuestionIndex = 0; 
@@ -660,7 +528,6 @@ function nextQuestion() {
     const currentQ = quizQueue[currentQuestionIndex];
     currentQuizSession.answers[currentQ.id] = currentQ.multiple ? [...selectedOptionValues] : selectedOptionValues[0];
 
-    // 分流邏輯
     if (currentQ.id === 'Q1') {
         const branchChoice = selectedOptionValues[0];
         const branchQuestions = scentQuizData.branches[branchChoice];
@@ -670,17 +537,10 @@ function nextQuestion() {
     }
 
     currentQuestionIndex++;
-
-    if (currentQuestionIndex < quizQueue.length) {
-        renderQuestion();
-    } else {
-        finishQuiz(); 
-    }
+    if (currentQuestionIndex < quizQueue.length) { renderQuestion(); } 
+    else { finishQuiz(); }
 }
 
-// =======================================================
-// ★ 演算法引擎：生成專屬調香處方箋
-// =======================================================
 function finishQuiz() {
     document.getElementById('quizContainer').style.display = 'none';
     const resultBox = document.getElementById('quizResult');
@@ -692,7 +552,6 @@ function finishQuiz() {
     };
 
     const allQuestions = [...scentQuizData.baseQuestions, ...(scentQuizData.branches[ans['Q1']] || [])];
-    
     let topNote = '佛手柑、清涼微風'; 
     let middleNote = '純淨白麝香';
     let baseNote = '溫暖雪松';
@@ -720,14 +579,10 @@ function finishQuiz() {
             <p style="color: var(--text-muted); letter-spacing: 2px; font-size: 0.85rem; margin: 0 0 10px 0;">YOUR SCENT NARRATIVE</p>
             <h3 style="color: var(--lavender-primary); font-size: 1.6rem; margin: 0 0 5px 0;">《${mainProfile.name}》</h3>
             <p style="font-style: italic; color: var(--text-dark); margin-bottom: 2rem;">${mainProfile.quote}</p>
-            
             <div style="text-align: left; background: #faf9f8; padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem;">
-                <h4 style="margin-top: 0; color: var(--text-dark); border-bottom: 1px solid #ddd; padding-bottom: 8px;">專屬香氣結構 (The Pyramid)</h4>
-                <p><strong>前調 (Top)</strong>： ${topNote}</p>
-                <p><strong>中調 (Middle)</strong>： ${middleNote}</p>
-                <p><strong>後調 (Base)</strong>： ${baseNote}</p>
+                <h4 style="margin-top: 0; color: var(--text-dark); border-bottom: 1px solid #ddd; padding-bottom: 8px;">專屬香氣結構</h4>
+                <p><strong>前調 (Top)</strong>： ${topNote}</p><p><strong>中調 (Middle)</strong>： ${middleNote}</p><p><strong>後調 (Base)</strong>： ${baseNote}</p>
             </div>
-
             <div style="text-align: left; line-height: 1.8; color: #555; font-size: 0.95rem;">
                 <p><strong>氣味解析：</strong></p>
                 <p>初聞時，<strong>[${topNote}]</strong> 就像 ${getOptionLabel('A1', ans['A1'])}</p>
@@ -748,4 +603,152 @@ function getOptionLabel(questionId, value) {
     if (!q) return '一段未知的旅程。';
     const opt = q.options.find(o => o.value === value);
     return opt ? opt.label.replace(/。$/, '') + '；' : '一段未知的旅程。';
+}
+
+
+/* =======================================================
+   6. 分頁三：結帳工作台 (POS Checkout & 促銷引擎)
+   ======================================================= */
+// 商品目錄庫 (包含特定優惠系列)
+const productCatalog = [
+    { id: 'P01', name: '客製化調香香水 (50ml)', series: '調香訂製', price: 3280 },
+    { id: 'P02', name: '薰衣草保濕潔手露', series: '薰衣草淨化系列', price: 850 },
+    { id: 'P03', name: '薰衣草舒緩沐浴油', series: '薰衣草淨化系列', price: 1250 },
+    { id: 'P04', name: '晨露花香香氛蠟燭', series: '晨露花香系列', price: 1580 },
+    { id: 'P05', name: '大理石擴香石', series: '居家空間系列', price: 980 }
+];
+
+let shoppingCart = [];
+
+// 初始化結帳台
+function initPOS() {
+    renderProductCatalog();
+    updateCartUI();
+}
+
+// 渲染左側商品清單
+function renderProductCatalog() {
+    const grid = document.getElementById('productGrid');
+    grid.innerHTML = '';
+    productCatalog.forEach(product => {
+        grid.innerHTML += `
+            <div class="product-card" onclick="addToCart('${product.id}')">
+                <div class="product-series">${product.series}</div>
+                <div class="product-name">${product.name}</div>
+                <div class="product-price">NT$ ${product.price.toLocaleString()}</div>
+            </div>
+        `;
+    });
+}
+
+// 加入購物車
+function addToCart(productId) {
+    const product = productCatalog.find(p => p.id === productId);
+    if(product) {
+        shoppingCart.push(product);
+        updateCartUI();
+    }
+}
+
+// 移除購物車商品
+function removeFromCart(index) {
+    shoppingCart.splice(index, 1);
+    updateCartUI();
+}
+
+// ★ 核心促銷引擎：更新購物車與折扣計算
+function updateCartUI() {
+    const customerInfo = document.getElementById('cartCustomerInfo');
+    const member = memberDatabase[currentViewedMemberPhone];
+
+    // 更新顧客資訊看板
+    if (member) {
+        customerInfo.innerHTML = `<strong>👤 結帳對象：${member.name}</strong> 
+                                  <br><span style="color:#888; font-size:0.85rem;">目前累積點數: ${member.points} pts ｜ 
+                                  特定優惠使用狀態：${member.usedSeriesDiscount ? '<span style="color:#d9534f">已使用過</span>' : '<span style="color:var(--lavender-primary)">尚未使用</span>'}</span>`;
+    } else {
+        customerInfo.innerHTML = `<strong>🚶‍♂️ 非會員結帳 (Walk-in)</strong> <br><span style="color:#888; font-size:0.85rem;">無法累積點數或使用專屬優惠</span>`;
+    }
+
+    // 渲染購物車清單
+    const cartItemsDiv = document.getElementById('cartItems');
+    cartItemsDiv.innerHTML = '';
+    let subtotal = 0;
+    let targetSeriesTotal = 0; // 用來計算「薰衣草淨化系列」的總額
+
+    shoppingCart.forEach((item, index) => {
+        subtotal += item.price;
+        if(item.series === '薰衣草淨化系列') {
+            targetSeriesTotal += item.price;
+        }
+
+        cartItemsDiv.innerHTML += `
+            <div class="cart-item">
+                <div class="cart-item-name">
+                    ${item.name} <br><span style="font-size:0.75rem; color:#888;">${item.series}</span>
+                </div>
+                <div class="cart-item-price">$${item.price}</div>
+                <button class="btn-remove" onclick="removeFromCart(${index})">✕</button>
+            </div>
+        `;
+    });
+
+    // 計算滿2000折200優惠 (特定系列、會員專屬、限用一次)
+    let discount = 0;
+    if (member && !member.usedSeriesDiscount && targetSeriesTotal >= 2000) {
+        discount = 200;
+    }
+
+    const total = subtotal - discount;
+
+    // 更新金額顯示
+    document.getElementById('cartSubtotal').textContent = `$${subtotal.toLocaleString()}`;
+    document.getElementById('cartDiscount').textContent = `-$${discount}`;
+    document.getElementById('cartTotal').textContent = `$${total.toLocaleString()}`;
+}
+
+// 執行結帳
+function processCheckout() {
+    if (shoppingCart.length === 0) { alert('購物車是空的！'); return; }
+
+    let subtotal = 0;
+    let targetSeriesTotal = 0;
+    shoppingCart.forEach(item => {
+        subtotal += item.price;
+        if(item.series === '薰衣草淨化系列') targetSeriesTotal += item.price;
+    });
+
+    const member = memberDatabase[currentViewedMemberPhone];
+    let discount = 0;
+    
+    // 如果符合優惠條件，結帳時將標籤改為「已使用」
+    if (member && !member.usedSeriesDiscount && targetSeriesTotal >= 2000) {
+        discount = 200;
+        member.usedSeriesDiscount = true; 
+    }
+    
+    const total = subtotal - discount;
+
+    if (member) {
+        // 寫入會員資料庫：點數 (100元1點)、累積消費、訂單紀錄
+        const earnedPoints = Math.floor(total / 100);
+        member.points += earnedPoints;
+        member.annualSpend += total;
+        
+        shoppingCart.forEach(item => {
+            member.orders.unshift({ 
+                id: 'ORD-' + Math.floor(Math.random() * 10000), 
+                item: item.name, 
+                status: '已領取' // 現場結帳直接算已領取
+            });
+        });
+
+        alert(`✅ 結帳成功！總金額：$${total.toLocaleString()}。\n${discount > 0 ? '(已自動折抵薰衣草系列滿額 $200)\n' : ''}已為 ${member.name} 累積 ${earnedPoints} 點。`);
+    } else {
+        alert(`✅ 非會員結帳成功！總金額：$${total.toLocaleString()}。`);
+    }
+
+    // 清空購物車
+    shoppingCart = [];
+    updateCartUI();
 }
